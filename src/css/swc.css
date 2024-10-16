@@ -1,0 +1,154 @@
+/* SenangWebs Chatbot Styles */
+
+[data-swc] {
+  font-family: inherit;
+  max-width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.swc-chat-display {
+  height: 300px;
+  overflow-y: auto;
+  padding: 8px 12px;
+  background-color: #f9f9f9;
+  scroll-behavior: smooth;
+  position: relative;
+}
+
+.swc-chat-display.swc-modern {
+  display: flex;
+  flex-direction: column;
+}
+
+.swc-message {
+  margin: 4px 0;
+  padding: 8px 12px;
+  border-radius: 12px;
+  max-width: 80%;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.swc-classic .swc-message {
+  border-radius: 0;
+  max-width: 100%;
+}
+
+.swc-bot-message {
+  align-self: flex-start;
+  background-color: #e0e0e0;
+}
+
+.swc-bot-message::before {
+  content: var(--swc-bot-name);
+  font-weight: bold;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.swc-user-message {
+  align-self: flex-end;
+  background-color: var(--swc-theme-color, #007bff);
+  color: white;
+}
+
+.swc-classic .swc-user-message {
+  background-color: transparent;
+  color: inherit;
+}
+
+.swc-classic .swc-user-message::before {
+  content: "You: ";
+  font-weight: bold;
+}
+
+.swc-input-container {
+  display: flex;
+  background-color: #fff;
+}
+
+.swc-user-input {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border: none;
+}
+
+.swc-user-input:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.swc-send-button {
+  padding: 8px 12px;
+  background-color: var(--swc-theme-color, #007bff);
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.swc-send-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.swc-options-container {
+  padding: 8px;
+  background-color: rgba(0, 0, 0, 0.05);
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.swc-options-container button {
+  padding: 4px 8px;
+  background-color: #fff;
+  border: 1px solid var(--swc-theme-color, #007bff);
+  color: var(--swc-theme-color, #007bff);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.swc-options-container button:hover {
+  background-color: var(--swc-theme-color, #007bff);
+  color: #fff;
+}
+
+.swc-typing-indicator {
+  display: flex;
+  align-items: center;
+  column-gap: 6px;
+  padding: 8px 12px;
+  background-color: #e0e0e0;
+  border-radius: 12px;
+  width: fit-content;
+  margin: 8px 0;
+  align-self: flex-start;
+}
+
+.swc-typing-indicator span {
+  width: 8px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 1s infinite;
+}
+
+.swc-typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.swc-typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.5; }
+}
