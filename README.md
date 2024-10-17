@@ -6,12 +6,13 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 
 - Easy to integrate with existing projects
 - Customizable chatbot interface
-- Keyword-based response system
+- Keyword-based response system with partial matching
 - Supports conversation flow with options
 - Themeable with custom colors
 - Modern and classic chat display styles
 - Typing indicator with customizable delay
 - Smooth scrolling and fade-in animations
+- Support for external knowledge base via JSON
 - Efficient performance
 - Responsive and works on all modern browsers
 
@@ -32,7 +33,7 @@ You can include SenangWebs Chatbot directly in your HTML file using unpkg:
 <script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
 ```
 
-## Usage
+## Basic Usage
 
 1. Include the SenangWebs Chatbot CSS and JavaScript files in your HTML:
 
@@ -69,6 +70,65 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 ```
 
+## Advanced Usage: External JSON Knowledge Base
+
+You can use an external JSON file to define your chatbot's knowledge base. This allows for easier management and updating of the chatbot's responses without modifying the main code.
+
+1. Create a JSON file for your knowledge base (e.g., `knowledge-base.json`):
+
+```json
+{
+  "knowledgeBase": [
+    {
+      "id": "welcome",
+      "keyword": ["hello", "hi", "hey", "start"],
+      "reply": "Welcome to SenangWebs Chatbot! How can I assist you today?",
+      "options": [
+        { "label": "Product Information", "reply_id": "product_info" },
+        { "label": "Pricing", "reply_id": "pricing" },
+        { "label": "Support", "reply_id": "support" }
+      ]
+    },
+    // Add more nodes as needed
+  ]
+}
+```
+
+2. Use the following HTML and JavaScript to load and use the external knowledge base:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SenangWebs Chatbot Example</title>
+    <link rel="stylesheet" href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css">
+    <script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
+</head>
+<body>
+    <div id="chatbot-container" data-swc data-swc-theme-color="#4CAF50" data-swc-bot-name="SenangBot" data-swc-chat-display="modern" data-swc-reply-duration="800"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('knowledge-base.json')
+                .then(response => response.json())
+                .then(data => {
+                    initializeChatbot(data.knowledgeBase);
+                })
+                .catch(error => {
+                    console.error('Error loading knowledge base:', error);
+                    // Initialize with default knowledge base if there's an error
+                    initializeChatbot();
+                });
+        });
+    </script>
+</body>
+</html>
+```
+
+This example demonstrates how to load an external JSON file and use it to initialize the chatbot. If the JSON file fails to load, it falls back to the default knowledge base.
+
 ## Configuration Options
 
 ### Chatbot Container Attributes
@@ -102,7 +162,7 @@ The knowledge base is an array of objects with the following structure:
 - `reply`: The chatbot's response text
 - `options`: (Optional) An array of follow-up options for the user to choose from
 
-Note: The chatbot now uses a more flexible keyword matching system. It will match full keywords, partial keywords, and even consider multiple keyword matches in a single user input. This allows for more natural conversation flow and better handling of variations in user input.
+Note: The chatbot uses a flexible keyword matching system. It will match full keywords, partial keywords, and even consider multiple keyword matches in a single user input. This allows for more natural conversation flow and better handling of variations in user input.
 
 ## Customization
 
