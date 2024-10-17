@@ -1,78 +1,83 @@
 // SenangWebs Chatbot Library
 
 class SenangWebsChatbot {
-    constructor(knowledgeBase) {
-      this.knowledgeBase = knowledgeBase;
-      this.currentNode = null;
-    }
-  
-    init() {
-      this.currentNode = this.knowledgeBase.find(node => node.id === 'welcome') || this.knowledgeBase[0];
-      return {
-        reply: this.currentNode.reply,
-        options: this.currentNode.options
-      };
-    }
-  
-    handleInput(input) {
-      const lowercaseInput = input.toLowerCase();
-      const words = lowercaseInput.split(/\s+/);
-  
-      const keywordCounts = {};
-      this.knowledgeBase.forEach(node => {
-        node.keyword.forEach(keyword => {
-          keywordCounts[keyword] = words.filter(word => word === keyword).length;
+  constructor(knowledgeBase) {
+    this.knowledgeBase = knowledgeBase;
+    this.currentNode = null;
+  }
+
+  init() {
+    this.currentNode = this.knowledgeBase.find(node => node.id === 'welcome') || this.knowledgeBase[0];
+    return {
+      reply: this.currentNode.reply,
+      options: this.currentNode.options
+    };
+  }
+
+  handleInput(input) {
+    const lowercaseInput = input.toLowerCase();
+    const words = lowercaseInput.split(/\s+/);
+
+    const keywordScores = {};
+    this.knowledgeBase.forEach(node => {
+      keywordScores[node.id] = 0;
+      node.keyword.forEach(keyword => {
+        const lowercaseKeyword = keyword.toLowerCase();
+        words.forEach(word => {
+          if (word.includes(lowercaseKeyword) || lowercaseKeyword.includes(word)) {
+            keywordScores[node.id]++;
+          }
         });
       });
-  
-      let bestMatch = null;
-      let maxScore = 0;
-  
-      this.knowledgeBase.forEach(node => {
-        const score = node.keyword.reduce((sum, keyword) => sum + (keywordCounts[keyword] || 0), 0);
-        if (score > maxScore) {
-          maxScore = score;
-          bestMatch = node;
-        }
-      });
-  
-      if (bestMatch) {
-        this.currentNode = bestMatch;
-        return {
-          reply: bestMatch.reply,
-          options: bestMatch.options
-        };
-      } else {
-        return {
-          reply: "I'm sorry, I didn't understand that. Can you please rephrase?",
-          options: null
-        };
+    });
+
+    let bestMatch = null;
+    let maxScore = 0;
+
+    Object.entries(keywordScores).forEach(([nodeId, score]) => {
+      if (score > maxScore) {
+        maxScore = score;
+        bestMatch = this.knowledgeBase.find(node => node.id === nodeId);
       }
-    }
-  
-    handleOptionSelection(replyId) {
-      const nextNode = this.knowledgeBase.find(node => node.id === replyId);
-      if (nextNode) {
-        this.currentNode = nextNode;
-        return {
-          reply: nextNode.reply,
-          options: nextNode.options
-        };
-      } else {
-        return {
-          reply: "I'm sorry, I couldn't find the appropriate response. How else can I assist you?",
-          options: null
-        };
-      }
+    });
+
+    if (bestMatch) {
+      this.currentNode = bestMatch;
+      return {
+        reply: bestMatch.reply,
+        options: bestMatch.options
+      };
+    } else {
+      return {
+        reply: "I'm sorry, I didn't understand that. Can you please rephrase?",
+        options: null
+      };
     }
   }
+
+  handleOptionSelection(replyId) {
+    const nextNode = this.knowledgeBase.find(node => node.id === replyId);
+    if (nextNode) {
+      this.currentNode = nextNode;
+      return {
+        reply: nextNode.reply,
+        options: nextNode.options
+      };
+    } else {
+      return {
+        reply: "I'm sorry, I couldn't find the appropriate response. How else can I assist you?",
+        options: null
+      };
+    }
+  }
+}
   
   // Default knowledge base
   const defaultKnowledgeBase = [
     {
       id: 'welcome',
       keyword: ['hello', 'hi', 'hey'],
-      reply: 'Welcome! How can I assist you today?',
+      reply: 'Welcome! How can I assist you <b>today?</b> <a href="https://senangwebs.com">senangwebs.com</a>',
       options: [
         { label: 'Get Help', reply_id: 'help' },
         { label: 'End Chat', reply_id: 'goodbye' },

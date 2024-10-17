@@ -98,9 +98,11 @@ The knowledge base is an array of objects with the following structure:
 ```
 
 - `id`: A unique identifier for the conversation node
-- `keyword`: An array of keywords that trigger this response
+- `keyword`: An array of keywords that trigger this response. The chatbot will match full or partial keywords in the user's input.
 - `reply`: The chatbot's response text
 - `options`: (Optional) An array of follow-up options for the user to choose from
+
+Note: The chatbot now uses a more flexible keyword matching system. It will match full keywords, partial keywords, and even consider multiple keyword matches in a single user input. This allows for more natural conversation flow and better handling of variations in user input.
 
 ## Customization
 
