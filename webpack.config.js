@@ -3,8 +3,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   entry: {
-    swc: './src/js/swc.js',
-    styles: './src/css/swc.css'
+    swc: ['./src/js/swc.js', './src/css/swc.css'],
   },
   output: {
     filename: '[name].js',
