@@ -81,6 +81,10 @@
   border: none;
 }
 
+.swc-user-input:focus {
+  outline: none;
+}
+
 .swc-user-input:disabled {
   background-color: #f0f0f0;
   cursor: not-allowed;
