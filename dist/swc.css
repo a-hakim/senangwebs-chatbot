@@ -291,7 +291,7 @@
 .swc-stop-button:focus,
 .swc-send-button:focus,
 .swc-user-input:focus {
-  outline: 2px solid var(--swc-theme-color, #007bff);
+  /* outline: 2px solid var(--swc-theme-color, #007bff); */
   outline-offset: 2px;
 }
 
