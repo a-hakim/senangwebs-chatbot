@@ -5,113 +5,80 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Test OpenRouter Integration</title>
     <link rel="stylesheet" href="../../dist/swc.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="../../dist/swc.js"></script>
-    <style>
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            padding: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        .success {
-            background: #d4edda;
-            border: 1px solid #28a745;
-            padding: 15px;
-            margin-bottom: 20px;
-        }
-        input {
-            width: 100%;
-            border: 1px solid #ddd;
-        }
-        button {
-            background: #007bff;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            cursor: pointer;
-        }
-        button:hover {
-            background: #0056b3;
-        }
-    </style>
 </head>
-<body>
-    <div class="container">
-        <h1>🧪 OpenRouter API Test</h1>
-        
-        <div class="warning">
-            <strong>⚠️ API Key Required</strong><br>
-            Enter your OpenRouter API key below to test. Get one at: 
-            <a href="https://openrouter.ai/keys" target="_blank">https://openrouter.ai/keys</a>
-        </div>
-
-        <div id="setup">
-            <label for="apiKey"><strong>API Key:</strong></label>
-            <input type="password" id="apiKey" placeholder="sk-or-v1-...">
+<body class="bg-gray-100 font-sans">
+    <div class="container max-w-3xl mx-auto my-12 px-5">
+        <div class="bg-white p-8 shadow-lg rounded-lg">
+            <h1 class="text-3xl font-bold mb-6 text-gray-800">🧪 OpenRouter API Test</h1>
             
-            <label for="model"><strong>Model:</strong></label>
-            <select id="model" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
-                <option value="openai/gpt-3.5-turbo">OpenAI GPT-3.5 Turbo (Fast & Cheap)</option>
-                <option value="openai/gpt-4-turbo">OpenAI GPT-4 Turbo (Smart & Expensive)</option>
-                <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
-                <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Open Source)</option>
-                <option value="nvidia/nemotron-nano-12b-v2-vl:free">NVIDIA NeMoT-Nano 12B-v2-vl (Free)</option>
-            </select>
+            <div class="bg-yellow-50 border border-yellow-400 rounded-lg p-4 mb-5">
+                <strong class="text-yellow-800">⚠️ API Key Required</strong><br>
+                <span class="text-yellow-700">Enter your OpenRouter API key below to test. Get one at: 
+                <a href="https://openrouter.ai/keys" target="_blank" class="text-blue-600 hover:underline">https://openrouter.ai/keys</a></span>
+            </div>
 
-            <label for="mode"><strong>Mode:</strong></label>
-            <select id="mode" style="width: 100%; padding: 10px; margin: 10px 0; border: 1px solid #ddd; border-radius: 6px;">
-                <option value="ai-only">AI Only</option>
-                <option value="hybrid" selected>Hybrid (Recommended)</option>
-                <option value="keyword-only">Keyword Only (No API)</option>
-            </select>
+            <div id="setup">
+                <label for="apiKey" class="block font-semibold text-gray-700 mb-2">API Key:</label>
+                <input type="password" id="apiKey" placeholder="sk-or-v1-..." 
+                       class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                
+                <label for="model" class="block font-semibold text-gray-700 mb-2">Model:</label>
+                <select id="model" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <option value="openai/gpt-3.5-turbo">OpenAI GPT-3.5 Turbo (Fast & Cheap)</option>
+                    <option value="openai/gpt-4-turbo">OpenAI GPT-4 Turbo (Smart & Expensive)</option>
+                    <option value="anthropic/claude-3-haiku">Claude 3 Haiku (Fast)</option>
+                    <option value="meta-llama/llama-3-8b-instruct">Llama 3 8B (Open Source)</option>
+                    <option value="nvidia/nemotron-nano-12b-v2-vl:free">NVIDIA NeMoT-Nano 12B-v2-vl (Free)</option>
+                </select>
 
-            <button onclick="initializeChat()">🚀 Initialize Chatbot</button>
-        </div>
+                <label for="mode" class="block font-semibold text-gray-700 mb-2">Mode:</label>
+                <select id="mode" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500">
+                    <option value="ai-only">AI Only</option>
+                    <option value="hybrid" selected>Hybrid (Recommended)</option>
+                    <option value="keyword-only">Keyword Only (No API)</option>
+                </select>
 
-        <div id="status" style="display: none;" class="success">
-            <strong>✅ Chatbot Initialized!</strong><br>
-            Mode: <span id="currentMode"></span> | Model: <span id="currentModel"></span>
-        </div>
+                <button onclick="initializeChat()" 
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors duration-200">
+                    🚀 Initialize Chatbot
+                </button>
+            </div>
 
-        <div id="chatContainer" style="margin-top: 30px; display: none;">
-            <h2>Chat</h2>
-            <!-- Chatbot will be dynamically inserted here -->
-        </div>
+            <div id="status" style="display: none;" class="bg-green-50 border border-green-500 rounded-lg p-4 mb-5">
+                <strong class="text-green-800">✅ Chatbot Initialized!</strong><br>
+                <span class="text-green-700">Mode: <span id="currentMode"></span> | Model: <span id="currentModel"></span></span>
+            </div>
 
-        <div id="instructions" style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px;">
-            <h3>Testing Instructions:</h3>
-            <ol style="line-height: 1.8;">
-                <li>Enter your OpenRouter API key above</li>
-                <li>Select a model and mode</li>
-                <li>Click "Initialize Chatbot"</li>
-                <li>Try these test queries:
-                    <ul>
-                        <li><strong>Keyword test:</strong> "hello" or "help"</li>
-                        <li><strong>AI test:</strong> "What's 2+2?" or "Tell me a joke"</li>
-                        <li><strong>Streaming test:</strong> Ask a longer question</li>
-                    </ul>
-                </li>
-                <li>Watch for:
-                    <ul>
-                        <li>Typing indicators</li>
-                        <li>Streaming text appearing character by character</li>
-                        <li>Stop button during AI responses</li>
-                        <li>Different message styles (keyword vs AI)</li>
-                    </ul>
-                </li>
-            </ol>
+            <div id="chatContainer" style="display: none;" class="mt-8">
+                <h2 class="text-2xl font-bold mb-4 text-gray-800">Chat</h2>
+                <!-- Chatbot will be dynamically inserted here -->
+            </div>
+
+            <div id="instructions" class="mt-8 p-6 bg-gray-50 rounded-lg">
+                <h3 class="text-xl font-bold mb-4 text-gray-800">Testing Instructions:</h3>
+                <ol class="list-decimal list-inside space-y-3 text-gray-700 leading-relaxed">
+                    <li>Enter your OpenRouter API key above</li>
+                    <li>Select a model and mode</li>
+                    <li>Click "Initialize Chatbot"</li>
+                    <li>Try these test queries:
+                        <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+                            <li><strong>Keyword test:</strong> "hello" or "help"</li>
+                            <li><strong>AI test:</strong> "What's 2+2?" or "Tell me a joke"</li>
+                            <li><strong>Streaming test:</strong> Ask a longer question</li>
+                        </ul>
+                    </li>
+                    <li>Watch for:
+                        <ul class="list-disc list-inside ml-6 mt-2 space-y-1">
+                            <li>Typing indicators</li>
+                            <li>Streaming text appearing character by character</li>
+                            <li>Stop button during AI responses</li>
+                            <li>Different message styles (keyword vs AI)</li>
+                        </ul>
+                    </li>
+                </ol>
+            </div>
         </div>
     </div>
 
