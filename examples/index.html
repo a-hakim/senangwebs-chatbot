@@ -14,6 +14,25 @@
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
+        <h1 class="text-3xl font-bold mb-2">SenangWebs Chatbot Showcase</h1>
+        <p class="text-gray-600 mb-6">Lightweight JavaScript chatbot library with chat history support</p>
+
+        <!-- Navigation Links -->
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <h5 class="font-semibold mb-3 text-blue-800">📚 Demo Pages:</h5>
+            <div class="flex flex-wrap gap-3">
+                <a href="./index.html" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                    🏠 Basic Showcase
+                </a>
+                <a href="./history-demo.html" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition">
+                    📝 History Management
+                </a>
+                <a href="./declarative-loading-demo.html" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+                    🔧 Declarative Loading
+                </a>
+            </div>
+        </div>
+
         <h4 class="text-xl lg:text-2xl capitalize font-bold mb-4">Modern Style</h4>
         <div class="bg-white border border-neutral-200 rounded-lg lg:rounded-2xl p-4 mb-8">
             <div data-swc data-swc-theme-color="#0D9488" data-swc-bot-name="SenangWebs" data-swc-reply-duration="500"
@@ -30,9 +49,8 @@
     </main>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeChatbot();
-        });
+        // Chatbot auto-initializes via DOMContentLoaded
+        // No manual initialization needed
     </script>
 
 </body>

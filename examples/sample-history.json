@@ -1,0 +1,55 @@
+{
+  "version": "1.0",
+  "timestamp": "2025-11-02T10:30:00Z",
+  "botName": "SenangWebs",
+  "themeColor": "#0D9488",
+  "messages": [
+    {
+      "id": "msg-1730544000001",
+      "timestamp": "2025-11-02T10:30:00Z",
+      "type": "bot",
+      "content": "Welcome! How can I assist you <b>today?</b> <a href=\"https://senangwebs.com\">senangwebs.com</a>",
+      "nodeId": "welcome",
+      "options": [
+        { "label": "Get Help", "reply_id": "help" },
+        { "label": "End Chat", "reply_id": "goodbye" }
+      ]
+    },
+    {
+      "id": "msg-1730544005001",
+      "timestamp": "2025-11-02T10:30:05Z",
+      "type": "user",
+      "content": "Hello, I need help with your product"
+    },
+    {
+      "id": "msg-1730544006001",
+      "timestamp": "2025-11-02T10:30:06Z",
+      "type": "bot",
+      "content": "Sure, I can help! What do you need assistance with?",
+      "nodeId": "help",
+      "options": [
+        { "label": "Product Information", "reply_id": "product" },
+        { "label": "Billing", "reply_id": "billing" },
+        { "label": "Technical Support", "reply_id": "tech_support" }
+      ]
+    },
+    {
+      "id": "msg-1730544010001",
+      "timestamp": "2025-11-02T10:30:10Z",
+      "type": "user",
+      "content": "Tell me about product features"
+    },
+    {
+      "id": "msg-1730544011001",
+      "timestamp": "2025-11-02T10:30:11Z",
+      "type": "bot",
+      "content": "Our product offers cutting-edge features including AI-powered analytics, real-time collaboration, and seamless integration with popular tools.",
+      "nodeId": "features",
+      "options": [
+        { "label": "Back to Product Info", "reply_id": "product" },
+        { "label": "End Chat", "reply_id": "goodbye" }
+      ]
+    }
+  ],
+  "currentNodeId": "features"
+}

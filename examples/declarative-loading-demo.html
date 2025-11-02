@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Declarative Loading Demo - SenangWebs Chatbot</title>
+    <link rel="stylesheet" href="../dist/swc.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../dist/swc.js"></script>
+</head>
+<body class="bg-gray-100">
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <h1 class="text-3xl font-bold mb-4">Declarative History Loading Demo</h1>
+        
+        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+            <h5 class="font-semibold mb-2 text-blue-800">ℹ️ About This Demo:</h5>
+            <p class="text-sm text-blue-700">
+                This page demonstrates the <code class="bg-blue-100 px-1 py-0.5 rounded">data-swc-load</code> attribute 
+                that automatically loads chat history when the chatbot initializes. The example below loads from 
+                <code class="bg-blue-100 px-1 py-0.5 rounded">sample-history.json</code>.
+            </p>
+        </div>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Example 1: Load from External File -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Example 1: Load from External File</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 mb-4">
+                    <div data-swc 
+                         data-swc-theme-color="#0D9488" 
+                         data-swc-bot-name="SenangWebs" 
+                         data-swc-reply-duration="500"
+                         data-swc-chat-display="modern"
+                         data-swc-load="./sample-history.json"
+                         class="max-w-lg mx-auto">
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h5 class="font-semibold mb-2">HTML Code:</h5>
+                    <pre class="text-xs overflow-x-auto"><code>&lt;div data-swc 
+     data-swc-theme-color="#0D9488" 
+     data-swc-bot-name="SenangWebs"
+     data-swc-load="./sample-history.json"&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </div>
+            
+            <!-- Example 2: Load from Inline JSON -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Example 2: Load from Inline JSON</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 mb-4">
+                    <div data-swc 
+                         data-swc-theme-color="#8B5CF6" 
+                         data-swc-bot-name="Assistant" 
+                         data-swc-reply-duration="500"
+                         data-swc-chat-display="modern"
+                         data-swc-load='{"version":"1.0","timestamp":"2025-11-02T10:00:00Z","botName":"Assistant","themeColor":"#8B5CF6","messages":[{"id":"msg-1","timestamp":"2025-11-02T10:00:00Z","type":"bot","content":"This chat was restored from inline JSON!","nodeId":"welcome","options":[{"label":"Continue","reply_id":"help"}]},{"id":"msg-2","timestamp":"2025-11-02T10:00:05Z","type":"user","content":"Great! This is a pre-loaded conversation."},{"id":"msg-3","timestamp":"2025-11-02T10:00:06Z","type":"bot","content":"Yes! You can embed the entire history directly in the HTML attribute.","nodeId":"help"}],"currentNodeId":"help"}'
+                         class="max-w-lg mx-auto">
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h5 class="font-semibold mb-2">HTML Code:</h5>
+                    <pre class="text-xs overflow-x-auto"><code>&lt;div data-swc 
+     data-swc-theme-color="#8B5CF6" 
+     data-swc-bot-name="Assistant"
+     data-swc-load='{...inline JSON...}'&gt;
+&lt;/div&gt;</code></pre>
+                </div>
+            </div>
+            
+        </div>
+        
+        <div class="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Example 3: Normal Initialization (No History) -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Example 3: Normal Initialization</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 mb-4">
+                    <div data-swc 
+                         data-swc-theme-color="#F59E0B" 
+                         data-swc-bot-name="Helper" 
+                         data-swc-reply-duration="500"
+                         data-swc-chat-display="modern"
+                         class="max-w-lg mx-auto">
+                    </div>
+                </div>
+                
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <h5 class="font-semibold mb-2">HTML Code:</h5>
+                    <pre class="text-xs overflow-x-auto"><code>&lt;div data-swc 
+     data-swc-theme-color="#F59E0B" 
+     data-swc-bot-name="Helper"&gt;
+&lt;/div&gt;
+
+&lt;!-- No data-swc-load attribute --&gt;</code></pre>
+                    <p class="text-sm text-gray-600 mt-2">
+                        Without <code class="bg-gray-200 px-1 py-0.5 rounded">data-swc-load</code>, 
+                        the chatbot starts fresh with the welcome message.
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Usage Examples -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Use Cases</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-4">
+                    
+                    <div>
+                        <h5 class="font-semibold text-green-700 mb-2">✅ External File Loading</h5>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• Restore previous chat sessions</li>
+                            <li>• Load predefined conversation flows</li>
+                            <li>• Share chat history between users</li>
+                            <li>• Demo/showcase specific conversations</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-semibold text-purple-700 mb-2">✅ Inline JSON Loading</h5>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• Embed history directly in HTML</li>
+                            <li>• Dynamic history from server-side rendering</li>
+                            <li>• Testing and debugging</li>
+                            <li>• Simple single-page applications</li>
+                        </ul>
+                    </div>
+                    
+                    <div>
+                        <h5 class="font-semibold text-red-700 mb-2">⚠️ Error Handling</h5>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• Invalid JSON → Falls back to default</li>
+                            <li>• 404 errors → Falls back to default</li>
+                            <li>• CORS issues → Check server headers</li>
+                            <li>• Errors logged to console</li>
+                        </ul>
+                    </div>
+                    
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Declarative Loading Demo initialized');
+            console.log('Check the Network tab to see sample-history.json being loaded');
+        });
+    </script>
+
+</body>
+</html>

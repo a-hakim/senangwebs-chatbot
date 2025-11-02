@@ -1,22 +1,54 @@
 // SenangWebs Chatbot Library
 
 class SenangWebsChatbot {
-  constructor(knowledgeBase) {
+  constructor(knowledgeBase, botMetadata = {}) {
     this.knowledgeBase = knowledgeBase;
     this.currentNode = null;
+    this.chatHistory = [];
+    this.botMetadata = {
+      botName: botMetadata.botName || 'Bot',
+      themeColor: botMetadata.themeColor || '#007bff',
+      timestamp: new Date().toISOString()
+    };
   }
 
   init() {
     this.currentNode = this.knowledgeBase.find(node => node.id === 'welcome') || this.knowledgeBase[0];
-    return {
+    const response = {
       reply: this.currentNode.reply,
       options: this.currentNode.options
     };
+    
+    // Add welcome message to history
+    this.addToHistory('bot', this.currentNode.reply, this.currentNode.id, this.currentNode.options);
+    
+    return response;
+  }
+  
+  addToHistory(type, content, nodeId = null, options = null) {
+    const message = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      timestamp: new Date().toISOString(),
+      type: type,
+      content: content
+    };
+    
+    if (type === 'bot') {
+      message.nodeId = nodeId;
+      if (options && options.length > 0) {
+        message.options = options;
+      }
+    }
+    
+    this.chatHistory.push(message);
   }
 
   handleInput(input) {
     const lowercaseInput = input.toLowerCase();
     const words = lowercaseInput.split(/\s+/);
+
+    // Add user message to history
+    this.addToHistory('user', input);
 
     const keywordScores = {};
     this.knowledgeBase.forEach(node => {
@@ -43,13 +75,18 @@ class SenangWebsChatbot {
 
     if (bestMatch) {
       this.currentNode = bestMatch;
+      // Add bot response to history
+      this.addToHistory('bot', bestMatch.reply, bestMatch.id, bestMatch.options);
       return {
         reply: bestMatch.reply,
         options: bestMatch.options
       };
     } else {
+      const fallbackReply = "I'm sorry, I didn't understand that. Can you please rephrase?";
+      // Add fallback response to history
+      this.addToHistory('bot', fallbackReply, null, null);
       return {
-        reply: "I'm sorry, I didn't understand that. Can you please rephrase?",
+        reply: fallbackReply,
         options: null
       };
     }
@@ -59,16 +96,122 @@ class SenangWebsChatbot {
     const nextNode = this.knowledgeBase.find(node => node.id === replyId);
     if (nextNode) {
       this.currentNode = nextNode;
+      // Add bot response to history
+      this.addToHistory('bot', nextNode.reply, nextNode.id, nextNode.options);
       return {
         reply: nextNode.reply,
         options: nextNode.options
       };
     } else {
+      const fallbackReply = "I'm sorry, I couldn't find the appropriate response. How else can I assist you?";
+      // Add fallback response to history
+      this.addToHistory('bot', fallbackReply, null, null);
       return {
-        reply: "I'm sorry, I couldn't find the appropriate response. How else can I assist you?",
+        reply: fallbackReply,
         options: null
       };
     }
+  }
+  
+  // Phase 1.2: Export History
+  exportHistory() {
+    const historyData = {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      botName: this.botMetadata.botName,
+      themeColor: this.botMetadata.themeColor,
+      messages: this.chatHistory,
+      currentNodeId: this.currentNode ? this.currentNode.id : null
+    };
+    
+    return JSON.stringify(historyData, null, 2);
+  }
+  
+  getCurrentState() {
+    return {
+      currentNodeId: this.currentNode ? this.currentNode.id : null,
+      messageCount: this.chatHistory.length,
+      lastMessageTimestamp: this.chatHistory.length > 0 
+        ? this.chatHistory[this.chatHistory.length - 1].timestamp 
+        : null
+    };
+  }
+  
+  // Phase 1.3: Load History
+  loadHistory(historyData) {
+    try {
+      // Parse if string, use directly if object
+      const data = typeof historyData === 'string' 
+        ? JSON.parse(historyData) 
+        : historyData;
+      
+      // Validate structure
+      if (!data.version || !data.messages || !Array.isArray(data.messages)) {
+        throw new Error('Invalid history format: missing required fields');
+      }
+      
+      // Check version compatibility
+      if (data.version !== "1.0") {
+        console.warn(`History version ${data.version} may not be fully compatible`);
+      }
+      
+      // Update bot metadata if present
+      if (data.botName) this.botMetadata.botName = data.botName;
+      if (data.themeColor) this.botMetadata.themeColor = data.themeColor;
+      
+      // Restore chat history
+      this.chatHistory = data.messages;
+      
+      // Restore current node state
+      if (data.currentNodeId) {
+        const node = this.knowledgeBase.find(n => n.id === data.currentNodeId);
+        if (node) {
+          this.currentNode = node;
+        }
+      }
+      
+      return {
+        success: true,
+        messageCount: this.chatHistory.length,
+        messages: this.chatHistory
+      };
+      
+    } catch (error) {
+      console.error('Error loading history:', error);
+      return {
+        success: false,
+        error: error.message,
+        messages: []
+      };
+    }
+  }
+  
+  // Phase 1.4: Clear History
+  clearHistory() {
+    this.chatHistory = [];
+    this.currentNode = this.knowledgeBase.find(node => node.id === 'welcome') || this.knowledgeBase[0];
+    
+    // Add welcome message to fresh history
+    if (this.currentNode) {
+      this.addToHistory('bot', this.currentNode.reply, this.currentNode.id, this.currentNode.options);
+    }
+    
+    return {
+      reply: this.currentNode ? this.currentNode.reply : '',
+      options: this.currentNode ? this.currentNode.options : null
+    };
+  }
+  
+  // Phase 4.1: Get History (returns object not string)
+  getHistory() {
+    return {
+      version: "1.0",
+      timestamp: new Date().toISOString(),
+      botName: this.botMetadata.botName,
+      themeColor: this.botMetadata.themeColor,
+      messages: this.chatHistory,
+      currentNodeId: this.currentNode ? this.currentNode.id : null
+    };
   }
 }
   
@@ -188,10 +331,34 @@ class SenangWebsChatbot {
       const botName = element.getAttribute('data-swc-bot-name') || 'Bot';
       const chatDisplayStyle = element.getAttribute('data-swc-chat-display') || 'classic';
       const replyDuration = parseInt(element.getAttribute('data-swc-reply-duration')) || 0;
+      const loadHistory = element.getAttribute('data-swc-load');
       
-      const chatbot = new SenangWebsChatbot(customKnowledgeBase || defaultKnowledgeBase);
+      // Phase 2.1: Create chatbot instance with metadata
+      const chatbot = new SenangWebsChatbot(
+        customKnowledgeBase || defaultKnowledgeBase,
+        { botName, themeColor }
+      );
+      
+      // Phase 2.1: Store instance on element for external access
+      element.chatbotInstance = chatbot;
+      
       const { chatDisplay, userInput, sendButton, optionsContainer, typingIndicator } = createChatbotUI(element, themeColor, botName, chatDisplayStyle);
   
+      // Phase 2.3: Render message helper function
+      function renderMessage(message) {
+        const messageElement = document.createElement('div');
+        messageElement.className = `swc-message swc-${message.type}-message`;
+        messageElement.innerHTML = message.content;
+        chatDisplay.appendChild(messageElement);
+      }
+      
+      // Phase 2.3: Clear display helper
+      function clearDisplay() {
+        chatDisplay.innerHTML = '';
+        optionsContainer.innerHTML = '';
+        optionsContainer.style.display = 'none';
+      }
+      
       function displayBotMessage(message, options) {
         removeTypingIndicator();
         const messageElement = document.createElement('div');
@@ -300,9 +467,125 @@ class SenangWebsChatbot {
         }
       });
   
-      // Initialize the chatbot
-      const initialResponse = chatbot.init();
-      displayBotMessage(initialResponse.reply, initialResponse.options);
+      // Phase 4.2: Enhanced clearHistory with UI update and event
+      const originalClearHistory = chatbot.clearHistory.bind(chatbot);
+      chatbot.clearHistory = function() {
+        const result = originalClearHistory();
+        clearDisplay();
+        displayBotMessage(result.reply, result.options);
+        
+        // Dispatch custom event
+        element.dispatchEvent(new CustomEvent('swc:history-cleared', {
+          detail: { timestamp: new Date().toISOString() }
+        }));
+        
+        return result;
+      };
+      
+      // Phase 4.2: Enhanced exportHistory with event
+      const originalExportHistory = chatbot.exportHistory.bind(chatbot);
+      chatbot.exportHistory = function() {
+        const historyJSON = originalExportHistory();
+        
+        // Dispatch custom event
+        element.dispatchEvent(new CustomEvent('swc:history-exported', {
+          detail: {
+            messageCount: chatbot.chatHistory.length,
+            historyJSON: historyJSON,
+            timestamp: new Date().toISOString()
+          }
+        }));
+        
+        return historyJSON;
+      };
+      
+      // Phase 4.2: Enhanced loadHistory with UI update and event
+      const originalLoadHistory = chatbot.loadHistory.bind(chatbot);
+      chatbot.loadHistory = function(historyData) {
+        const result = originalLoadHistory(historyData);
+        
+        if (result.success) {
+          clearDisplay();
+          
+          // Render all messages from history
+          result.messages.forEach(msg => {
+            renderMessage(msg);
+          });
+          
+          // Render options from last message if present
+          if (result.messages.length > 0) {
+            const lastMessage = result.messages[result.messages.length - 1];
+            if (lastMessage.options && lastMessage.options.length > 0) {
+              optionsContainer.style.display = 'flex';
+              lastMessage.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option.label;
+                button.onclick = () => handleOptionClick(option.reply_id);
+                optionsContainer.appendChild(button);
+              });
+            }
+          }
+          
+          smoothScrollToBottom(chatDisplay);
+          
+          // Dispatch custom event
+          element.dispatchEvent(new CustomEvent('swc:history-loaded', {
+            detail: {
+              messageCount: result.messageCount,
+              timestamp: new Date().toISOString()
+            }
+          }));
+        } else {
+          console.error('Failed to load history:', result.error);
+        }
+        
+        return result;
+      };
+  
+      // Phase 3: Declarative History Loading
+      if (loadHistory) {
+        // Check if it's a URL/file path or JSON string
+        const isUrl = loadHistory.startsWith('http://') || 
+                      loadHistory.startsWith('https://') || 
+                      loadHistory.startsWith('./') || 
+                      loadHistory.startsWith('../') ||
+                      loadHistory.endsWith('.json');
+        
+        if (isUrl) {
+          // Phase 3.2: Load from external file
+          fetch(loadHistory)
+            .then(response => {
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              return response.json();
+            })
+            .then(data => {
+              chatbot.loadHistory(data);
+            })
+            .catch(error => {
+              console.error('Error loading history from file:', error);
+              // Fallback to default initialization
+              const initialResponse = chatbot.init();
+              displayBotMessage(initialResponse.reply, initialResponse.options);
+            });
+        } else {
+          // Phase 3.3: Load from inline JSON string
+          try {
+            const data = JSON.parse(loadHistory);
+            chatbot.loadHistory(data);
+          } catch (error) {
+            console.error('Error parsing inline history JSON:', error);
+            // Fallback to default initialization
+            const initialResponse = chatbot.init();
+            displayBotMessage(initialResponse.reply, initialResponse.options);
+          }
+        }
+      } else {
+        // Initialize the chatbot normally
+        const initialResponse = chatbot.init();
+        displayBotMessage(initialResponse.reply, initialResponse.options);
+      }
     });
   }
   
@@ -312,4 +595,14 @@ class SenangWebsChatbot {
   // Make initializeChatbot globally accessible
   if (typeof window !== 'undefined') {
     window.initializeChatbot = initializeChatbot;
+    
+    // Auto-initialize on DOMContentLoaded
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => {
+        initializeChatbot();
+      });
+    } else {
+      // DOM already loaded
+      initializeChatbot();
+    }
   }

@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat History Demo - SenangWebs Chatbot</title>
+    <link rel="stylesheet" href="../dist/swc.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../dist/swc.js"></script>
+</head>
+<body class="bg-gray-100">
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <h1 class="text-3xl font-bold mb-4">Chat History Feature Demo</h1>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            
+            <!-- Chatbot Column -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Chatbot</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg mb-4 overflow-hidden">
+                    <div data-swc 
+                         data-swc-theme-color="#0D9488" 
+                         data-swc-bot-name="SenangWebs" 
+                         data-swc-reply-duration="500"
+                         data-swc-chat-display="modern">
+                    </div>
+                </div>
+                
+                <!-- Custom Control Buttons -->
+                <div class="bg-white border border-neutral-200 rounded-lg p-4">
+                    <h5 class="font-semibold mb-3">History Controls</h5>
+                    <div class="flex flex-wrap gap-2">
+                        <button id="exportBtn" class="px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 transition">
+                            Export History
+                        </button>
+                        <button id="clearBtn" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition">
+                            Clear History
+                        </button>
+                        <input type="file" id="importFile" accept=".json" style="display:none">
+                        <button id="importBtn" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">
+                            Import History
+                        </button>
+                        <button id="saveLocalBtn" class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">
+                            Save to LocalStorage
+                        </button>
+                        <button id="loadLocalBtn" class="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700 transition">
+                            Load from LocalStorage
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Info & Logs Column -->
+            <div>
+                <h4 class="text-xl font-bold mb-4">Event Logs</h4>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div id="eventLog" class="font-mono text-sm space-y-2 max-h-96 overflow-y-auto">
+                        <p class="text-gray-500">Events will appear here...</p>
+                    </div>
+                </div>
+                
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 mt-4">
+                    <h5 class="font-semibold mb-2">Current State</h5>
+                    <div id="stateInfo" class="text-sm space-y-1">
+                        <p><strong>Messages:</strong> <span id="msgCount">0</span></p>
+                        <p><strong>Current Node:</strong> <span id="currentNode">-</span></p>
+                        <p><strong>Last Update:</strong> <span id="lastUpdate">-</span></p>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                    <h5 class="font-semibold mb-2 text-blue-800">💡 Try This:</h5>
+                    <ul class="text-sm space-y-1 text-blue-700">
+                        <li>1. Have a conversation with the chatbot</li>
+                        <li>2. Click "Export History" to download JSON</li>
+                        <li>3. Click "Clear History" to reset</li>
+                        <li>4. Click "Import History" to restore from file</li>
+                        <li>5. Use LocalStorage buttons for quick save/load</li>
+                    </ul>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait for chatbot to be initialized
+            setTimeout(() => {
+                const chatbotElement = document.querySelector('[data-swc]');
+                const bot = chatbotElement.chatbotInstance;
+                const eventLog = document.getElementById('eventLog');
+                
+                if (!bot) {
+                    console.error('Chatbot instance not found');
+                    return;
+                }
+            
+            // Helper to log events
+            function logEvent(eventName, details = {}) {
+                const timestamp = new Date().toLocaleTimeString();
+                const logEntry = document.createElement('div');
+                logEntry.className = 'p-2 bg-gray-50 rounded border-l-4 border-teal-500';
+                logEntry.innerHTML = `
+                    <div class="font-semibold text-teal-700">[${timestamp}] ${eventName}</div>
+                    ${Object.keys(details).length > 0 ? 
+                        `<div class="text-gray-600 mt-1">${JSON.stringify(details, null, 2)}</div>` : 
+                        ''
+                    }
+                `;
+                eventLog.prepend(logEntry);
+                
+                // Keep only last 10 entries
+                while (eventLog.children.length > 10) {
+                    eventLog.removeChild(eventLog.lastChild);
+                }
+            }
+            
+            // Update state display
+            function updateState() {
+                const state = bot.getCurrentState();
+                document.getElementById('msgCount').textContent = state.messageCount;
+                document.getElementById('currentNode').textContent = state.currentNodeId || 'N/A';
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+            }
+            
+            // Export history
+            document.getElementById('exportBtn').onclick = () => {
+                const history = bot.exportHistory();
+                const blob = new Blob([history], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `chat-history-${Date.now()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                
+                logEvent('Manual Export', { size: history.length });
+            };
+            
+            // Clear history
+            document.getElementById('clearBtn').onclick = () => {
+                if (confirm('Are you sure you want to clear the chat history?')) {
+                    bot.clearHistory();
+                }
+            };
+            
+            // Import history
+            document.getElementById('importBtn').onclick = () => {
+                document.getElementById('importFile').click();
+            };
+            
+            document.getElementById('importFile').onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            bot.loadHistory(event.target.result);
+                            logEvent('File Import Success', { filename: file.name });
+                        } catch (error) {
+                            alert('Error loading history: ' + error.message);
+                            logEvent('File Import Error', { error: error.message });
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            
+            // Save to localStorage
+            document.getElementById('saveLocalBtn').onclick = () => {
+                const history = bot.exportHistory();
+                localStorage.setItem('swc-demo-history', history);
+                logEvent('Saved to LocalStorage', { size: history.length });
+                alert('History saved to LocalStorage!');
+            };
+            
+            // Load from localStorage
+            document.getElementById('loadLocalBtn').onclick = () => {
+                const history = localStorage.getItem('swc-demo-history');
+                if (history) {
+                    bot.loadHistory(history);
+                    logEvent('Loaded from LocalStorage');
+                } else {
+                    alert('No history found in LocalStorage');
+                    logEvent('LocalStorage Load Failed', { reason: 'No data found' });
+                }
+            };
+            
+            // Listen to history events
+            chatbotElement.addEventListener('swc:history-exported', (e) => {
+                logEvent('History Exported', { 
+                    messageCount: e.detail.messageCount,
+                    timestamp: e.detail.timestamp 
+                });
+                updateState();
+            });
+            
+            chatbotElement.addEventListener('swc:history-loaded', (e) => {
+                logEvent('History Loaded', { 
+                    messageCount: e.detail.messageCount,
+                    timestamp: e.detail.timestamp 
+                });
+                updateState();
+            });
+            
+            chatbotElement.addEventListener('swc:history-cleared', (e) => {
+                logEvent('History Cleared', { 
+                    timestamp: e.detail.timestamp 
+                });
+                updateState();
+            });
+            
+            // Initial state update
+            setTimeout(() => {
+                updateState();
+                logEvent('Demo Initialized');
+            }, 500);
+            
+            }, 100); // Wait for auto-initialization
+        });
+    </script>
+
+</body>
+</html>
