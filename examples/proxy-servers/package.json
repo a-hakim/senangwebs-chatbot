@@ -1,0 +1,23 @@
+{
+  "name": "senangwebs-chatbot-proxy",
+  "version": "1.0.0",
+  "description": "Secure proxy server for SenangWebs Chatbot with OpenRouter API",
+  "main": "proxy-nodejs.js",
+  "scripts": {
+    "start": "node proxy-nodejs.js",
+    "dev": "nodemon proxy-nodejs.js"
+  },
+  "keywords": ["openrouter", "proxy", "chatbot", "api"],
+  "author": "SenangWebs",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.2",
+    "node-fetch": "^2.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

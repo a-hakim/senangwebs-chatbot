@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hybrid Mode Example | SenangWebs Chatbot</title>
+    <link rel="stylesheet" href="../../dist/swc.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../dist/swc.js"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">Hybrid Mode - Best of Both Worlds</h1>
+            <p class="text-gray-600 mb-4">Combines keyword-based responses with AI fallback for unknown queries</p>
+            
+            <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-blue-800">How Hybrid Mode Works</h3>
+                        <div class="mt-2 text-sm text-blue-700">
+                            <ul class="list-disc list-inside space-y-1">
+                                <li>Predefined keywords trigger fast, static responses</li>
+                                <li>Unknown queries automatically route to AI</li>
+                                <li>Low-confidence matches use AI for better answers</li>
+                                <li>Maintains context across both response types</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Try It Out Section -->
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Hybrid Chatbot -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">🤖 Hybrid Chatbot</h2>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div data-swc 
+                         data-swc-theme-color="#7C3AED" 
+                         data-swc-bot-name="Smart Assistant" 
+                         data-swc-chat-display="modern"
+                         data-swc-api-mode="hybrid"
+                         data-swc-api-key="YOUR_API_KEY"
+                         data-swc-api-model="nvidia/nemotron-nano-12b-v2-vl:free"
+                         data-swc-api-streaming="true"
+                         data-swc-hybrid-threshold="0.3"
+                         data-swc-system-prompt="You are a helpful customer support assistant. Be concise and friendly.">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Testing Guide -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">✨ Try These Queries</h2>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-4">
+                    <div>
+                        <h3 class="font-semibold text-green-600 mb-2">📚 Keyword Triggers (Fast)</h3>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• "hello" or "hi"</li>
+                            <li>• "help" or "support"</li>
+                            <li>• "product information"</li>
+                            <li>• "pricing" or "cost"</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h3 class="font-semibold text-purple-600 mb-2">🤖 AI Fallback (Smart)</h3>
+                        <ul class="text-sm space-y-1 text-gray-700">
+                            <li>• "What's the weather like?"</li>
+                            <li>• "Tell me a joke"</li>
+                            <li>• "How do I reset my password?"</li>
+                            <li>• "Compare your plans"</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-3 rounded">
+                        <p class="text-xs text-gray-600"><strong>Tip:</strong> Watch for the emoji indicators! 📚 = Keyword match, 🤖 = AI response</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Configuration Example -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+            <h2 class="text-xl font-bold mb-4">Configuration</h2>
+            <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>&lt;div data-swc 
+     data-swc-api-mode="hybrid"
+     data-swc-api-key="YOUR_API_KEY"
+     data-swc-api-model="openai/gpt-3.5-turbo"
+     data-swc-hybrid-threshold="0.3"
+     data-swc-system-prompt="Custom instructions for AI"&gt;
+&lt;/div&gt;
+
+&lt;script&gt;
+  // Or configure programmatically
+  const chatbot = new SenangWebsChatbot(
+    knowledgeBase,
+    { botName: 'Assistant', themeColor: '#7C3AED' },
+    {
+      mode: 'hybrid',
+      apiKey: 'YOUR_API_KEY',
+      model: 'openai/gpt-3.5-turbo',
+      hybridThreshold: 0.3,  // 0-1, higher = more AI usage
+      systemPrompt: 'You are a helpful assistant.',
+      streaming: true
+    }
+  );
+&lt;/script&gt;</code></pre>
+        </div>
+
+        <!-- Threshold Explanation -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Understanding Hybrid Threshold</h2>
+            <p class="text-gray-700 mb-4">The <code class="bg-gray-100 px-2 py-1 rounded">hybrid-threshold</code> controls when the chatbot switches from keywords to AI:</p>
+            
+            <div class="space-y-3">
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-32">
+                        <span class="inline-block bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">0.8 - 1.0</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-700"><strong>Very High</strong> - Requires multiple keyword matches. Most queries go to AI.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-32">
+                        <span class="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">0.5 - 0.7</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-700"><strong>Moderate</strong> - Needs good keyword match. Unclear queries go to AI.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-32">
+                        <span class="inline-block bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">0.3 (Default)</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-700"><strong>Balanced</strong> - Any keyword match uses static response. Perfect for hybrid mode.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start">
+                    <div class="flex-shrink-0 w-32">
+                        <span class="inline-block bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">0.0 - 0.2</span>
+                    </div>
+                    <div class="ml-4">
+                        <p class="text-sm text-gray-700"><strong>Keyword-First</strong> - Even weak matches use keywords. AI rarely used.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Benefits Section -->
+        <div class="grid md:grid-cols-3 gap-6 mt-6">
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-3xl mb-3">⚡</div>
+                <h3 class="font-bold mb-2">Fast & Reliable</h3>
+                <p class="text-sm text-gray-600">Instant responses for common queries with zero latency</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-3xl mb-3">🧠</div>
+                <h3 class="font-bold mb-2">Intelligent Fallback</h3>
+                <p class="text-sm text-gray-600">AI handles complex or unexpected questions seamlessly</p>
+            </div>
+            
+            <div class="bg-white rounded-lg shadow p-6">
+                <div class="text-3xl mb-3">💰</div>
+                <h3 class="font-bold mb-2">Cost Effective</h3>
+                <p class="text-sm text-gray-600">Reduce API costs by using keywords for common queries</p>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

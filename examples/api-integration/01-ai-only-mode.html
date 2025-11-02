@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenRouter API - Basic Example | SenangWebs Chatbot</title>
+    <link rel="stylesheet" href="../../dist/swc.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../dist/swc.js"></script>
+</head>
+
+<body class="bg-gray-100">
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold mb-2">OpenRouter API - Basic Example</h1>
+            <p class="text-gray-600 mb-4">AI-powered chatbot using OpenRouter API in AI-only mode</p>
+            
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-yellow-800">Demo Mode</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <p>Replace <code class="bg-yellow-100 px-1 rounded">YOUR_OPENROUTER_API_KEY</code> with your actual OpenRouter API key.</p>
+                            <p class="mt-1">Get your API key at: <a href="https://openrouter.ai/keys" target="_blank" class="underline">https://openrouter.ai/keys</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 mb-8">
+            <!-- Modern Style -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">Modern Style</h2>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div data-swc 
+                         data-swc-theme-color="#0D9488" 
+                         data-swc-bot-name="AI Assistant" 
+                         data-swc-chat-display="modern"
+                         data-swc-api-mode="ai-only"
+                         data-swc-api-key="YOUR_API_KEY"
+                         data-swc-api-model="nvidia/nemotron-nano-12b-v2-vl:free"
+                         data-swc-api-streaming="true"
+                         data-swc-api-max-tokens="500"
+                         data-swc-api-temperature="0.7"
+                         data-swc-system-prompt="You are a helpful and friendly AI assistant. Provide clear, concise answers.">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Classic Style -->
+            <div>
+                <h2 class="text-xl font-bold mb-4">Classic Style</h2>
+                <div class="bg-white border border-neutral-200 rounded-lg p-4">
+                    <div data-swc 
+                         data-swc-theme-color="#0D9488" 
+                         data-swc-bot-name="AI Assistant"
+                         data-swc-api-mode="ai-only"
+                         data-swc-api-key="YOUR_API_KEY"
+                         data-swc-api-model="nvidia/nemotron-nano-12b-v2-vl:free"
+                         data-swc-api-streaming="true"
+                         data-swc-system-prompt="You are a helpful and friendly AI assistant. Provide clear, concise answers.">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Code Example -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">HTML Code</h2>
+            <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>&lt;!-- Include CSS and JS --&gt;
+&lt;link rel="stylesheet" href="dist/swc.css"&gt;
+&lt;script src="dist/swc.js"&gt;&lt;/script&gt;
+
+&lt;!-- AI-Powered Chatbot --&gt;
+&lt;div data-swc 
+     data-swc-theme-color="#0D9488" 
+     data-swc-bot-name="AI Assistant" 
+     data-swc-chat-display="modern"
+     data-swc-api-mode="ai-only"
+     data-swc-api-key="YOUR_OPENROUTER_API_KEY"
+     data-swc-api-model="nvidia/nemotron-nano-12b-v2-vl:free"
+     data-swc-api-streaming="true"
+     data-swc-api-max-tokens="500"
+     data-swc-api-temperature="0.7"
+     data-swc-system-prompt="You are a helpful assistant."&gt;
+&lt;/div&gt;</code></pre>
+        </div>
+
+        <!-- Configuration Reference -->
+        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+            <h2 class="text-xl font-bold mb-4">Configuration Options</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Attribute</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Default</th>
+                            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-mode</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded">keyword-only</code></td>
+                            <td class="px-4 py-3">Mode: <code>keyword-only</code>, <code>ai-only</code>, or <code>hybrid</code></td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-key</td>
+                            <td class="px-4 py-3">-</td>
+                            <td class="px-4 py-3">OpenRouter API key (required for AI features)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-model</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded text-xs">nvidia/nemotron-nano-12b-v2-vl:free</code></td>
+                            <td class="px-4 py-3">Model identifier from OpenRouter</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-streaming</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded">true</code></td>
+                            <td class="px-4 py-3">Enable real-time streaming responses</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-max-tokens</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded">500</code></td>
+                            <td class="px-4 py-3">Maximum response length in tokens</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-api-temperature</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded">0.7</code></td>
+                            <td class="px-4 py-3">Response creativity (0-2, higher = more creative)</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-system-prompt</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded text-xs">You are a helpful...</code></td>
+                            <td class="px-4 py-3">System instructions for the AI</td>
+                        </tr>
+                        <tr>
+                            <td class="px-4 py-3 font-mono text-xs">data-swc-context-max-messages</td>
+                            <td class="px-4 py-3"><code class="bg-gray-100 px-2 py-1 rounded">10</code></td>
+                            <td class="px-4 py-3">Number of messages to keep in context</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Security Warning -->
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mt-6">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800">Security Warning</h3>
+                    <div class="mt-2 text-sm text-red-700">
+                        <p><strong>Never expose your API key in production!</strong></p>
+                        <p class="mt-1">For production deployments, use a server-side proxy to keep your API key secure. See the <a href="#" class="underline font-semibold">proxy setup guide</a> for more information.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>

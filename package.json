@@ -1,7 +1,7 @@
 {
   "name": "senangwebs-chatbot",
-  "version": "1.2.0",
-  "description": "Lightweight JavaScript library that enables easy integration of a customizable chatbot into your website.",
+  "version": "1.3.0",
+  "description": "Lightweight JavaScript library with OpenRouter API integration for AI-powered conversations.",
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode production",

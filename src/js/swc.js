@@ -1,7 +1,35 @@
 // SenangWebs Chatbot Library
 
+// Import API classes if they exist (for modular usage)
+// These classes can also be included separately in HTML
+let OpenRouterAPI, ContextManager;
+
+// Try to import classes (for webpack bundling)
+try {
+  if (typeof require !== 'undefined') {
+    OpenRouterAPI = require('./openrouter-client.js');
+    ContextManager = require('./context-manager.js');
+  }
+} catch (e) {
+  // Classes will be loaded from global scope or separate script tags
+}
+
+// Make classes available globally if not already defined
+if (typeof window !== 'undefined') {
+  if (!window.OpenRouterAPI && typeof OpenRouterAPI !== 'undefined') {
+    window.OpenRouterAPI = OpenRouterAPI;
+  }
+  if (!window.ContextManager && typeof ContextManager !== 'undefined') {
+    window.ContextManager = ContextManager;
+  }
+  
+  // Use global classes if available
+  OpenRouterAPI = window.OpenRouterAPI || OpenRouterAPI;
+  ContextManager = window.ContextManager || ContextManager;
+}
+
 class SenangWebsChatbot {
-  constructor(knowledgeBase, botMetadata = {}) {
+  constructor(knowledgeBase, botMetadata = {}, apiConfig = null) {
     this.knowledgeBase = knowledgeBase;
     this.currentNode = null;
     this.chatHistory = [];
@@ -10,6 +38,46 @@ class SenangWebsChatbot {
       themeColor: botMetadata.themeColor || '#007bff',
       timestamp: new Date().toISOString()
     };
+    
+    // API Configuration
+    this.apiConfig = apiConfig;
+    this.mode = apiConfig?.mode || 'keyword-only'; // 'keyword-only', 'ai-only', 'hybrid'
+    this.streamingEnabled = apiConfig?.streaming !== false;
+    this.aiResponseInProgress = false;
+    this.hybridThreshold = apiConfig?.hybridThreshold || 0.3; // Lower default for better keyword matching
+    
+    // Initialize API client and context manager if API is configured
+    if (apiConfig && apiConfig.apiKey) {
+      try {
+        // Check if OpenRouterAPI class is available
+        if (typeof OpenRouterAPI !== 'undefined') {
+          this.apiClient = new OpenRouterAPI(apiConfig);
+        } else {
+          console.error('[SWC] OpenRouterAPI class not found. Please include openrouter-client.js');
+          this.apiClient = null;
+        }
+        
+        // Check if ContextManager class is available
+        if (typeof ContextManager !== 'undefined') {
+          this.contextManager = new ContextManager({
+            systemPrompt: apiConfig.systemPrompt || 'You are a helpful assistant.',
+            maxMessages: apiConfig.contextMaxMessages || 10,
+            maxTokens: apiConfig.contextMaxTokens || 2000,
+            debug: apiConfig.debug || false
+          });
+        } else {
+          console.error('[SWC] ContextManager class not found. Please include context-manager.js');
+          this.contextManager = null;
+        }
+      } catch (error) {
+        console.error('[SWC] Error initializing API components:', error);
+        this.apiClient = null;
+        this.contextManager = null;
+      }
+    } else {
+      this.apiClient = null;
+      this.contextManager = null;
+    }
   }
 
   init() {
@@ -25,12 +93,13 @@ class SenangWebsChatbot {
     return response;
   }
   
-  addToHistory(type, content, nodeId = null, options = null) {
+  addToHistory(type, content, nodeId = null, options = null, source = 'keyword', modelInfo = null) {
     const message = {
       id: `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
       timestamp: new Date().toISOString(),
       type: type,
-      content: content
+      content: content,
+      source: source // 'keyword', 'api', or 'fallback'
     };
     
     if (type === 'bot') {
@@ -38,18 +107,27 @@ class SenangWebsChatbot {
       if (options && options.length > 0) {
         message.options = options;
       }
+      if (modelInfo) {
+        message.model = modelInfo.model;
+      }
     }
     
     this.chatHistory.push(message);
   }
 
-  handleInput(input) {
+  async handleInput(input, callbacks = {}) {
     const lowercaseInput = input.toLowerCase();
     const words = lowercaseInput.split(/\s+/);
 
     // Add user message to history
     this.addToHistory('user', input);
+    
+    // Add user message to context if API is enabled
+    if (this.contextManager) {
+      this.contextManager.addMessage('user', input);
+    }
 
+    // Keyword matching
     const keywordScores = {};
     this.knowledgeBase.forEach(node => {
       keywordScores[node.id] = 0;
@@ -72,24 +150,245 @@ class SenangWebsChatbot {
         bestMatch = this.knowledgeBase.find(node => node.id === nodeId);
       }
     });
+    
+    // Calculate confidence score (0-1 range)
+    // If we have a keyword match, confidence should be high enough to use it in hybrid mode
+    // Confidence increases with number of matching keywords
+    let confidence = 0;
+    if (maxScore > 0) {
+      // Base confidence of 0.5 for any match, plus 0.1 per additional match (capped at 1.0)
+      confidence = Math.min(0.5 + (maxScore - 1) * 0.1, 1.0);
+    }
 
+    // Debug logging for hybrid mode
+    if (this.mode === 'hybrid') {
+      console.log('[SWC Hybrid Debug]', {
+        input: input,
+        bestMatch: bestMatch ? bestMatch.id : null,
+        maxScore: maxScore,
+        confidence: confidence,
+        threshold: this.hybridThreshold,
+        willUseAI: !bestMatch || confidence < this.hybridThreshold
+      });
+    }
+
+    // Mode-based routing
+    if (this.mode === 'ai-only' && this.apiClient) {
+      // Always use AI
+      return await this.handleAIResponse(input, callbacks);
+    } else if (this.mode === 'hybrid' && this.apiClient) {
+      // Use AI if confidence is low or no match found
+      if (!bestMatch || confidence < this.hybridThreshold) {
+        return await this.handleAIResponse(input, callbacks);
+      }
+    } else if (this.mode === 'keyword-only' || !this.apiClient) {
+      // Fall through to keyword response
+    }
+
+    // Keyword-based response
     if (bestMatch) {
       this.currentNode = bestMatch;
       // Add bot response to history
-      this.addToHistory('bot', bestMatch.reply, bestMatch.id, bestMatch.options);
+      this.addToHistory('bot', bestMatch.reply, bestMatch.id, bestMatch.options, 'keyword');
+      
+      // Add to context if API is enabled
+      if (this.contextManager) {
+        this.contextManager.addMessage('assistant', bestMatch.reply);
+      }
+      
       return {
         reply: bestMatch.reply,
-        options: bestMatch.options
+        options: bestMatch.options,
+        source: 'keyword',
+        confidence: confidence
       };
     } else {
+      // No keyword match - try AI if available in hybrid mode
+      if (this.mode === 'hybrid' && this.apiClient) {
+        return await this.handleAIResponse(input, callbacks);
+      }
+      
+      // Fallback response
       const fallbackReply = "I'm sorry, I didn't understand that. Can you please rephrase?";
-      // Add fallback response to history
-      this.addToHistory('bot', fallbackReply, null, null);
+      this.addToHistory('bot', fallbackReply, null, null, 'fallback');
       return {
         reply: fallbackReply,
-        options: null
+        options: null,
+        source: 'fallback'
       };
     }
+  }
+
+  /**
+   * Handle AI-powered response using OpenRouter API
+   * @param {string} input - User input
+   * @param {Object} callbacks - Callbacks for streaming: onStart, onChunk, onComplete, onError
+   * @returns {Promise<Object>} Response object
+   */
+  async handleAIResponse(input, callbacks = {}) {
+    if (!this.apiClient) {
+      console.error('[SWC] API client not initialized');
+      return {
+        reply: "AI features are not configured properly.",
+        options: null,
+        source: 'error'
+      };
+    }
+
+    if (this.aiResponseInProgress) {
+      console.warn('[SWC] AI response already in progress');
+      return {
+        reply: "Please wait for the current response to complete.",
+        options: null,
+        source: 'error'
+      };
+    }
+
+    this.aiResponseInProgress = true;
+
+    try {
+      // Get conversation context
+      const messages = this.contextManager.getContext(true);
+
+      // Trigger onStart callback
+      if (callbacks.onStart) {
+        callbacks.onStart();
+      }
+
+      let fullResponse = '';
+
+      // Send message with streaming
+      const result = await this.apiClient.sendMessage(
+        messages,
+        // onChunk callback
+        (chunk) => {
+          fullResponse = chunk.fullContent;
+          if (callbacks.onChunk) {
+            callbacks.onChunk(chunk);
+          }
+        },
+        // onComplete callback
+        (response) => {
+          // Add AI response to history
+          const modelInfo = this.apiClient.getModelInfo();
+          this.addToHistory('bot', response.content, null, null, 'api', modelInfo);
+          
+          // Add to context
+          if (this.contextManager) {
+            this.contextManager.addMessage('assistant', response.content);
+          }
+          
+          if (callbacks.onComplete) {
+            callbacks.onComplete(response);
+          }
+        },
+        // onError callback
+        (error) => {
+          console.error('[SWC] AI response error:', error);
+          if (callbacks.onError) {
+            callbacks.onError(error);
+          }
+        }
+      );
+
+      this.aiResponseInProgress = false;
+
+      return {
+        reply: result.content,
+        options: null,
+        source: 'api',
+        model: result.model
+      };
+
+    } catch (error) {
+      this.aiResponseInProgress = false;
+      console.error('[SWC] Error in handleAIResponse:', error);
+
+      // Add error to history
+      const errorMessage = this._getErrorMessage(error);
+      this.addToHistory('bot', errorMessage, null, null, 'error');
+
+      if (callbacks.onError) {
+        callbacks.onError(error);
+      }
+
+      return {
+        reply: errorMessage,
+        options: null,
+        source: 'error'
+      };
+    }
+  }
+
+  /**
+   * Cancel ongoing AI response
+   */
+  cancelAIResponse() {
+    if (this.apiClient && this.aiResponseInProgress) {
+      this.apiClient.cancel();
+      this.aiResponseInProgress = false;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get user-friendly error message
+   * @private
+   */
+  _getErrorMessage(error) {
+    if (error.message.includes('Invalid API key')) {
+      return "⚠️ API authentication failed. Please check your API key configuration.";
+    } else if (error.message.includes('Rate limit')) {
+      return "⚠️ Too many requests. Please wait a moment and try again.";
+    } else if (error.message.includes('cancelled')) {
+      return "Response cancelled.";
+    } else if (error.message.includes('service is temporarily unavailable')) {
+      return "⚠️ The AI service is temporarily unavailable. Please try again later.";
+    } else {
+      return `⚠️ An error occurred: ${error.message}`;
+    }
+  }
+
+  /**
+   * Enhance prompt with knowledge base (RAG approach)
+   * @private
+   */
+  _enhancePromptWithKnowledge(input) {
+    // Find relevant knowledge base entries
+    const relevantNodes = [];
+    const lowercaseInput = input.toLowerCase();
+
+    this.knowledgeBase.forEach(node => {
+      node.keyword.forEach(keyword => {
+        if (lowercaseInput.includes(keyword.toLowerCase())) {
+          relevantNodes.push(node);
+        }
+      });
+    });
+
+    if (relevantNodes.length > 0) {
+      const knowledge = relevantNodes
+        .map(node => `Topic: ${node.id}\nInformation: ${node.reply}`)
+        .join('\n\n');
+
+      this.contextManager.injectKnowledge(knowledge);
+    }
+  }
+
+  /**
+   * Get API configuration and status
+   * @returns {Object} API status information
+   */
+  getAPIStatus() {
+    return {
+      enabled: !!this.apiClient,
+      mode: this.mode,
+      streaming: this.streamingEnabled,
+      model: this.apiClient ? this.apiClient.getModelInfo() : null,
+      contextStats: this.contextManager ? this.contextManager.getStats() : null,
+      responseInProgress: this.aiResponseInProgress
+    };
   }
 
   handleOptionSelection(replyId) {
@@ -116,12 +415,19 @@ class SenangWebsChatbot {
   // Phase 1.2: Export History
   exportHistory() {
     const historyData = {
-      version: "1.0",
+      version: "2.0", // Updated version for API support
       timestamp: new Date().toISOString(),
       botName: this.botMetadata.botName,
       themeColor: this.botMetadata.themeColor,
       messages: this.chatHistory,
-      currentNodeId: this.currentNode ? this.currentNode.id : null
+      currentNodeId: this.currentNode ? this.currentNode.id : null,
+      // API metadata
+      mode: this.mode,
+      apiEnabled: !!this.apiClient,
+      apiConfig: this.apiClient ? {
+        model: this.apiClient.model,
+        lastUsed: new Date().toISOString()
+      } : null
     };
     
     return JSON.stringify(historyData, null, 2);
@@ -151,7 +457,7 @@ class SenangWebsChatbot {
       }
       
       // Check version compatibility
-      if (data.version !== "1.0") {
+      if (!data.version.startsWith("1.") && !data.version.startsWith("2.")) {
         console.warn(`History version ${data.version} may not be fully compatible`);
       }
       
@@ -168,6 +474,18 @@ class SenangWebsChatbot {
         if (node) {
           this.currentNode = node;
         }
+      }
+      
+      // Restore API context if available
+      if (this.contextManager && data.messages) {
+        this.contextManager.clear();
+        data.messages.forEach(msg => {
+          if (msg.type === 'user') {
+            this.contextManager.addMessage('user', msg.content);
+          } else if (msg.type === 'bot') {
+            this.contextManager.addMessage('assistant', msg.content);
+          }
+        });
       }
       
       return {
@@ -205,12 +523,14 @@ class SenangWebsChatbot {
   // Phase 4.1: Get History (returns object not string)
   getHistory() {
     return {
-      version: "1.0",
+      version: "2.0",
       timestamp: new Date().toISOString(),
       botName: this.botMetadata.botName,
       themeColor: this.botMetadata.themeColor,
       messages: this.chatHistory,
-      currentNodeId: this.currentNode ? this.currentNode.id : null
+      currentNodeId: this.currentNode ? this.currentNode.id : null,
+      mode: this.mode,
+      apiEnabled: !!this.apiClient
     };
   }
 }
@@ -321,7 +641,7 @@ class SenangWebsChatbot {
     containerElement.style.setProperty('--swc-theme-color', themeColor);
     containerElement.style.setProperty('--swc-bot-name', `"${botName}"`);
   
-    return { chatDisplay, userInput, sendButton, optionsContainer, typingIndicator };
+    return { chatDisplay, userInput, sendButton, optionsContainer, typingIndicator, inputContainer };
   }
   
   function initializeChatbot(customKnowledgeBase = null) {
@@ -333,16 +653,53 @@ class SenangWebsChatbot {
       const replyDuration = parseInt(element.getAttribute('data-swc-reply-duration')) || 0;
       const loadHistory = element.getAttribute('data-swc-load');
       
-      // Phase 2.1: Create chatbot instance with metadata
+      // Parse API configuration from data attributes
+      const apiMode = element.getAttribute('data-swc-api-mode');
+      const apiKey = element.getAttribute('data-swc-api-key');
+      const apiModel = element.getAttribute('data-swc-api-model');
+      const apiStreaming = element.getAttribute('data-swc-api-streaming');
+      const apiMaxTokens = element.getAttribute('data-swc-api-max-tokens');
+      const apiTemperature = element.getAttribute('data-swc-api-temperature');
+      const systemPrompt = element.getAttribute('data-swc-system-prompt');
+      const contextMaxMessages = element.getAttribute('data-swc-context-max-messages');
+      const apiBaseURL = element.getAttribute('data-swc-api-base-url');
+      const hybridThreshold = element.getAttribute('data-swc-hybrid-threshold');
+      
+      // Build API config object if API key is provided
+      let apiConfig = null;
+      if (apiKey && apiMode !== 'keyword-only') {
+        apiConfig = {
+          apiKey: apiKey,
+          mode: apiMode || 'hybrid',
+          model: apiModel || 'openai/gpt-3.5-turbo',
+          streaming: apiStreaming !== 'false',
+          maxTokens: parseInt(apiMaxTokens) || 500,
+          temperature: parseFloat(apiTemperature) || 0.7,
+          systemPrompt: systemPrompt || 'You are a helpful assistant.',
+          contextMaxMessages: parseInt(contextMaxMessages) || 10,
+          baseURL: apiBaseURL,
+          hybridThreshold: parseFloat(hybridThreshold) || 0.7,
+          siteName: botName,
+          siteUrl: window.location.origin
+        };
+        
+        // Show warning about client-side API key
+        if (!apiBaseURL || apiBaseURL.includes('openrouter.ai')) {
+          console.warn('[SWC] ⚠️ API key is exposed in client-side code. For production, use a server-side proxy.');
+        }
+      }
+      
+      // Phase 2.1: Create chatbot instance with metadata and API config
       const chatbot = new SenangWebsChatbot(
         customKnowledgeBase || defaultKnowledgeBase,
-        { botName, themeColor }
+        { botName, themeColor },
+        apiConfig
       );
       
       // Phase 2.1: Store instance on element for external access
       element.chatbotInstance = chatbot;
       
-      const { chatDisplay, userInput, sendButton, optionsContainer, typingIndicator } = createChatbotUI(element, themeColor, botName, chatDisplayStyle);
+      const { chatDisplay, userInput, sendButton, optionsContainer, typingIndicator, inputContainer } = createChatbotUI(element, themeColor, botName, chatDisplayStyle);
   
       // Phase 2.3: Render message helper function
       function renderMessage(message) {
@@ -359,11 +716,12 @@ class SenangWebsChatbot {
         optionsContainer.style.display = 'none';
       }
       
-      function displayBotMessage(message, options) {
+      function displayBotMessage(message, options, isStreaming = false, source = 'keyword') {
         removeTypingIndicator();
         const messageElement = document.createElement('div');
-        messageElement.className = 'swc-message swc-bot-message';
+        messageElement.className = `swc-message swc-bot-message ${isStreaming ? 'swc-streaming' : ''} ${source === 'api' ? 'swc-ai-message' : ''}`;
         messageElement.innerHTML = `${message}`;
+        messageElement.setAttribute('data-message-id', `msg-${Date.now()}`);
         chatDisplay.appendChild(messageElement);
         smoothScrollToBottom(chatDisplay);
   
@@ -379,9 +737,24 @@ class SenangWebsChatbot {
         } else {
           optionsContainer.style.display = 'none';
         }
+        
+        return messageElement;
+      }
+      
+      // Create stop button for AI streaming
+      function createStopButton() {
+        const stopBtn = document.createElement('button');
+        stopBtn.className = 'swc-stop-button';
+        stopBtn.innerHTML = '⏹ Stop';
+        stopBtn.onclick = () => {
+          chatbot.cancelAIResponse();
+          stopBtn.remove();
+          enableUserInput();
+        };
+        return stopBtn;
       }
   
-      function handleUserInput() {
+      async function handleUserInput() {
         const message = userInput.value.trim();
         if (message) {
           const userMessageElement = document.createElement('div');
@@ -394,11 +767,77 @@ class SenangWebsChatbot {
           
           disableUserInput();
           showTypingIndicator();
-          setTimeout(() => {
-            const response = chatbot.handleInput(message);
-            displayBotMessage(response.reply, response.options);
-            enableUserInput();
-          }, replyDuration);
+          
+          // Check if this will be an AI response
+          const isAIEnabled = chatbot.mode !== 'keyword-only' && chatbot.apiClient;
+          let stopButton = null;
+          
+          if (isAIEnabled && replyDuration === 0) {
+            // For AI responses, add delay then proceed
+            setTimeout(async () => {
+              removeTypingIndicator();
+              
+              // Create streaming message element
+              let streamingMessage = null;
+              let stopButton = null;
+              
+              const response = await chatbot.handleInput(message, {
+                onStart: () => {
+                  // Create message element for streaming
+                  streamingMessage = displayBotMessage('', null, true, 'api');
+                  
+                  // Add stop button if streaming
+                  if (chatbot.streamingEnabled) {
+                    stopButton = createStopButton();
+                    inputContainer.insertBefore(stopButton, inputContainer.firstChild);
+                  }
+                },
+                onChunk: (chunk) => {
+                  // Update streaming message
+                  if (streamingMessage) {
+                    streamingMessage.innerHTML = chunk.fullContent;
+                    smoothScrollToBottom(chatDisplay);
+                  }
+                },
+                onComplete: (result) => {
+                  // Remove streaming class
+                  if (streamingMessage) {
+                    streamingMessage.classList.remove('swc-streaming');
+                  }
+                  // Remove stop button
+                  if (stopButton) {
+                    stopButton.remove();
+                  }
+                  enableUserInput();
+                },
+                onError: (error) => {
+                  // Remove stop button
+                  if (stopButton) {
+                    stopButton.remove();
+                  }
+                  // Display error
+                  if (streamingMessage) {
+                    streamingMessage.classList.remove('swc-streaming');
+                    streamingMessage.classList.add('swc-error-message');
+                  }
+                  enableUserInput();
+                }
+              });
+              
+              // If not streaming or error occurred, display normally
+              if (!streamingMessage) {
+                displayBotMessage(response.reply, response.options, false, response.source);
+                enableUserInput();
+              }
+            }, 500);
+          } else {
+            // Keyword-only mode or delay is set
+            setTimeout(async () => {
+              const response = await chatbot.handleInput(message);
+              displayBotMessage(response.reply, response.options, false, response.source);
+              enableUserInput();
+            }, replyDuration);
+          }
         }
       }
   
