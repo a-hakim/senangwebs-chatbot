@@ -2,6 +2,8 @@
 
 SenangWebs Chatbot is a lightweight JavaScript library that enables easy integration of a customizable chatbot into your website. With minimal setup, you can add an interactive customer support feature powered by AI or keyword-based responses to your web pages, enhancing user engagement and support capabilities.
 
+![SenangWebs Chatbot Preview](https://raw.githubusercontent.com/a-hakim/senangwebs-chatbot/master/swc_preview.png)
+
 ## Features
 
 ### Core Features
