@@ -13,6 +13,8 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 - Typing indicator with customizable delay
 - Smooth scrolling and fade-in animations
 - Support for external knowledge base via JSON
+- **Chat history management** - Export, import, and restore conversations
+- **Declarative history loading** - Load chat history via data attributes
 - Efficient performance
 - Responsive and works on all modern browsers
 
@@ -140,6 +142,7 @@ You can configure the chatbot appearance and behavior using the following attrib
 - `data-swc-bot-name`: Sets the name of the chatbot (e.g., "SenangWebs")
 - `data-swc-chat-display`: Sets the chat display style ("modern" or "classic")
 - `data-swc-reply-duration`: Sets the delay (in milliseconds) before the bot replies
+- `data-swc-load`: Loads chat history from a JSON file path or inline JSON string
 
 ### Knowledge Base Structure
 
@@ -164,6 +167,149 @@ The knowledge base is an array of objects with the following structure:
 
 Note: The chatbot uses a flexible keyword matching system. It will match full keywords, partial keywords, and even consider multiple keyword matches in a single user input. This allows for more natural conversation flow and better handling of variations in user input.
 
+## Chat History Management
+
+SenangWebs Chatbot includes powerful chat history features that allow you to save, load, and restore conversations.
+
+### History API
+
+Access the chatbot instance to manage history:
+
+```javascript
+const chatbotElement = document.querySelector('[data-swc]');
+const chatbot = chatbotElement.chatbotInstance;
+
+// Export history as JSON string
+const historyJSON = chatbot.exportHistory();
+
+// Load history from JSON string or object
+chatbot.loadHistory(historyData);
+
+// Clear all history
+chatbot.clearHistory();
+
+// Get current history
+const history = chatbot.getHistory();
+```
+
+### Declarative History Loading
+
+Load chat history directly via HTML data attributes:
+
+**Load from external JSON file:**
+
+```html
+<div data-swc 
+     data-swc-load="./path/to/history.json"
+     data-swc-theme-color="#ff6600">
+</div>
+```
+
+**Load from inline JSON:**
+
+```html
+<div data-swc 
+     data-swc-load='{"version":"1.0","messages":[...]}'
+     data-swc-theme-color="#ff6600">
+</div>
+```
+
+### History Data Structure
+
+The chat history is stored in the following JSON format:
+
+```json
+{
+  "version": "1.0",
+  "timestamp": "2024-11-02T10:30:00.000Z",
+  "botName": "SenangWebs",
+  "themeColor": "#ff6600",
+  "messages": [
+    {
+      "id": "msg-1730545800000-abc",
+      "timestamp": "2024-11-02T10:30:00.000Z",
+      "type": "bot",
+      "content": "<p>Welcome message</p>",
+      "nodeId": "welcome",
+      "options": [
+        { "label": "Option 1", "reply_id": "node_1" }
+      ]
+    },
+    {
+      "id": "msg-1730545810000-def",
+      "timestamp": "2024-11-02T10:30:10.000Z",
+      "type": "user",
+      "content": "User response"
+    }
+  ],
+  "currentNodeId": "welcome"
+}
+```
+
+### Custom Events
+
+The chatbot dispatches custom events for history operations:
+
+```javascript
+// Listen for history export
+chatbotElement.addEventListener('swc:history-exported', (e) => {
+  console.log('History exported:', e.detail.history);
+});
+
+// Listen for history load
+chatbotElement.addEventListener('swc:history-loaded', (e) => {
+  console.log('History loaded:', e.detail.messageCount);
+});
+
+// Listen for history clear
+chatbotElement.addEventListener('swc:history-cleared', () => {
+  console.log('History cleared');
+});
+```
+
+## Examples
+
+The `examples/` directory contains several demonstration pages:
+
+### 1. Basic Showcase (`index.html`)
+
+Demonstrates the chatbot with modern and classic display styles, theme customization, and basic functionality.
+
+### 2. History Management Demo (`history-demo.html`)
+
+Interactive demonstration of chat history features:
+
+- Export conversations as JSON files
+- Import and restore from JSON files
+- Clear conversation history
+- Save/load to/from LocalStorage
+- Real-time event logging
+
+### 3. Declarative Loading Demo (`declarative-loading-demo.html`)
+
+Shows different ways to load chat history declaratively:
+
+- Loading from external JSON files
+- Loading from inline JSON data
+- Normal initialization without history
+
+### Running Examples
+
+To run the examples locally:
+
+```bash
+# Using Python
+python -m http.server 8000
+
+# Using Node.js (http-server)
+npx http-server
+
+# Using PHP
+php -S localhost:8000
+```
+
+Then navigate to `http://localhost:8000/examples/`
+
 ## Customization
 
 You can customize the chatbot's appearance by modifying the CSS file or overriding styles in your own stylesheet. The chatbot's primary color and other visual aspects can be set using the data attributes on the container element.
@@ -187,11 +333,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Acknowledgments
-
-- Inspired by various chatbot implementations in the web development community
-- Thanks to all contributors who have helped to improve this library
 
 ## Support
 
