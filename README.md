@@ -758,15 +758,7 @@ npm run dev
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details.
-
-## Support
-
-If you encounter any issues or have questions:
-
-- **Issues**: [GitHub Issues](https://github.com/a-hakim/senangwebs-chatbot/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/a-hakim/senangwebs-chatbot/discussions)
-- **Email**: Support via GitHub only
+MIT License
 
 ## Security
 
