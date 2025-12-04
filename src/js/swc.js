@@ -719,6 +719,14 @@ function createChatbotUI(
 function initializeChatbot(customKnowledgeBase = null) {
   const chatbotElements = document.querySelectorAll("[data-swc]");
   chatbotElements.forEach((element) => {
+    // Prevent double initialization
+    if (element.chatbotInstance) return;
+
+    // Skip if manual initialization is requested and we are in auto-init mode (no custom KB)
+    if (!customKnowledgeBase && element.hasAttribute("data-swc-manual-init")) {
+      return;
+    }
+
     const themeColor =
       element.getAttribute("data-swc-theme-color") || "#007bff";
     const botName = element.getAttribute("data-swc-bot-name") || "Bot";

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Knowledge Base Example | SenangWebs Chatbot</title>
+    <link rel="stylesheet" href="../../dist/swc.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="../../dist/swc.js"></script>
+  </head>
+
+  <body class="bg-gray-100">
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <h1 class="text-3xl font-bold mb-2">Custom Knowledge Base</h1>
+      <p class="text-gray-600 mb-6">
+        Define your own conversation flow using a JSON object.
+      </p>
+
+      <div
+        class="bg-white border border-neutral-200 rounded-lg lg:rounded-2xl p-4 mb-8"
+      >
+        <div
+          data-swc
+          data-swc-manual-init
+          data-swc-theme-color="#7C3AED"
+          data-swc-bot-name="Support Bot"
+          data-swc-reply-duration="500"
+          data-swc-chat-display="modern"
+          class="max-w-lg mx-auto"
+        ></div>
+      </div>
+
+      <div class="bg-gray-800 text-gray-200 p-4 rounded-lg overflow-x-auto">
+        <h3 class="text-lg font-semibold mb-2 text-white">
+          Knowledge Base Structure:
+        </h3>
+        <pre><code class="language-javascript">const myKnowledgeBase = [
+  {
+    id: "welcome",
+    keyword: ["hello", "hi"],
+    reply: "Hello! I am a custom bot. How can I help?",
+    options: [
+      { label: "About", reply_id: "about" },
+      { label: "Contact", reply_id: "contact" }
+    ]
+  },
+  // ... more nodes
+];</code></pre>
+      </div>
+    </main>
+
+    <script>
+      // Define your custom knowledge base
+      const customKnowledgeBase = [
+        {
+          id: "welcome",
+          keyword: ["hello", "hi", "hey", "start"],
+          reply:
+            "Welcome to the Custom Knowledge Base Demo! 🚀<br>I am configured with a specific set of responses.",
+          options: [
+            { label: "What is this?", reply_id: "about" },
+            { label: "Show me features", reply_id: "features" },
+            { label: "Contact Support", reply_id: "contact" },
+          ],
+        },
+        {
+          id: "about",
+          keyword: ["about", "what", "info"],
+          reply:
+            "This is a demonstration of how to inject a custom JSON knowledge base into the SenangWebs Chatbot, overriding the default one.",
+          options: [
+            { label: "Back to Start", reply_id: "welcome" },
+            { label: "See Features", reply_id: "features" },
+          ],
+        },
+        {
+          id: "features",
+          keyword: ["features", "capabilities"],
+          reply:
+            "I can handle:<br>• Custom conversation flows<br>• HTML in responses<br>• Interactive options<br>• Keyword matching",
+          options: [{ label: "Back to Start", reply_id: "welcome" }],
+        },
+        {
+          id: "contact",
+          keyword: ["contact", "email", "phone"],
+          reply:
+            "You can reach us at <a href='mailto:support@example.com' class='text-blue-500 underline'>support@example.com</a>.",
+          options: [{ label: "Back to Start", reply_id: "welcome" }],
+        },
+        {
+          id: "fallback",
+          keyword: [],
+          reply:
+            "I'm sorry, I don't recognize that command. Please try one of the options below.",
+          options: [{ label: "Restart", reply_id: "welcome" }],
+        },
+      ];
+
+      // Initialize the chatbot with the custom knowledge base
+      // The 'data-swc-manual-init' attribute prevents auto-initialization
+      document.addEventListener("DOMContentLoaded", () => {
+        initializeChatbot(customKnowledgeBase);
+      });
+    </script>
+  </body>
+</html>

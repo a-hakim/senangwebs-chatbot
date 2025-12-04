@@ -20,6 +20,7 @@ examples/
 Start here if you're new to SenangWebs Chatbot:
 
 - **`basic/01-simple-chatbot.html`** - Traditional keyword-based chatbot
+- **`basic/02-custom-knowledge-base.html`** - Custom knowledge base using JSON
 
 **Features:**
 
@@ -164,6 +165,7 @@ open advanced-features/01-chat-history.html
 | Example                                             | Type     | Difficulty   | API Needed | Best For            |
 | --------------------------------------------------- | -------- | ------------ | ---------- | ------------------- |
 | `basic/01-simple-chatbot.html`                      | Keyword  | Beginner     | ❌         | FAQ, Simple bots    |
+| `basic/02-custom-knowledge-base.html`               | Keyword  | Beginner     | ❌         | Custom flows        |
 | `api-integration/01-ai-only-mode.html`              | AI       | Intermediate | ✅         | Conversational AI   |
 | `api-integration/02-hybrid-mode.html`               | Hybrid   | Intermediate | ✅         | Customer support    |
 | `api-integration/03-interactive-testing.html`       | Testing  | Advanced     | ✅         | Development         |
