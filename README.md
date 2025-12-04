@@ -7,6 +7,7 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 ## Features
 
 ### Core Features
+
 - Easy to integrate with existing projects
 - Customizable chatbot interface
 - Themeable with custom colors
@@ -17,11 +18,13 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 - Responsive and works on all modern browsers
 
 ### Conversation Modes
+
 - **Keyword-Only Mode** - Traditional keyword-based responses with partial matching
 - **AI-Only Mode** - Pure AI-powered conversations using OpenRouter API
 - **Hybrid Mode** - Intelligent fallback: keywords first, AI when no match found
 
 ### AI Capabilities (OpenRouter Integration)
+
 - **Multiple AI Models** - Support for GPT-3.5, GPT-4, Claude, Llama, and more
 - **Streaming Responses** - Real-time token-by-token text generation
 - **Context Management** - Maintains conversation history for coherent dialogues
@@ -31,6 +34,7 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 - **Proxy Support** - Secure API key handling via backend proxies
 
 ### Data Management
+
 - **Chat history management** - Export, import, and restore conversations
 - **Declarative history loading** - Load chat history via data attributes
 - **External knowledge base** - Load conversation flows from JSON files
@@ -49,7 +53,10 @@ npm install senangwebs-chatbot
 You can include SenangWebs Chatbot directly in your HTML file using unpkg:
 
 ```html
-<link rel="stylesheet" href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css">
+<link
+  rel="stylesheet"
+  href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css"
+/>
 <script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
 ```
 
@@ -60,19 +67,20 @@ You can include SenangWebs Chatbot directly in your HTML file using unpkg:
 1. Include the SenangWebs Chatbot CSS and JavaScript files in your HTML:
 
 ```html
-<link rel="stylesheet" href="path/to/swc.css">
+<link rel="stylesheet" href="path/to/swc.css" />
 <script src="path/to/swc.js"></script>
 ```
 
 2. Add the chatbot container to your HTML:
 
 ```html
-<div data-swc 
-     data-swc-theme-color="#ff6600" 
-     data-swc-bot-name="SenangWebs" 
-     data-swc-chat-display="modern" 
-     data-swc-reply-duration="500">
-</div>
+<div
+  data-swc
+  data-swc-theme-color="#ff6600"
+  data-swc-bot-name="SenangWebs"
+  data-swc-chat-display="modern"
+  data-swc-reply-duration="500"
+></div>
 ```
 
 3. Initialize the chatbot:
@@ -80,7 +88,7 @@ You can include SenangWebs Chatbot directly in your HTML file using unpkg:
 The chatbot will initialize automatically when the DOM is fully loaded. If you need to initialize it manually or with a custom knowledge base, you can do so in your JavaScript code:
 
 ```javascript
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener("DOMContentLoaded", function () {
   // Use default knowledge base
   initializeChatbot();
 
@@ -97,16 +105,17 @@ document.addEventListener('DOMContentLoaded', function() {
 Enable AI-powered conversations using OpenRouter API:
 
 ```html
-<div data-swc 
-     data-swc-theme-color="#0D9488" 
-     data-swc-bot-name="AI Assistant" 
-     data-swc-chat-display="modern"
-     data-swc-api-mode="ai-only"
-     data-swc-api-key="sk-or-v1-..."
-     data-swc-api-model="openai/gpt-3.5-turbo"
-     data-swc-api-streaming="true"
-     data-swc-system-prompt="You are a helpful customer support assistant. Be concise and friendly.">
-</div>
+<div
+  data-swc
+  data-swc-theme-color="#0D9488"
+  data-swc-bot-name="AI Assistant"
+  data-swc-chat-display="modern"
+  data-swc-api-mode="ai-only"
+  data-swc-api-key="sk-or-v1-..."
+  data-swc-api-model="openai/gpt-3.5-turbo"
+  data-swc-api-streaming="true"
+  data-swc-system-prompt="You are a helpful customer support assistant. Be concise and friendly."
+></div>
 ```
 
 ### 3. Hybrid Mode (Best of Both Worlds)
@@ -114,18 +123,20 @@ Enable AI-powered conversations using OpenRouter API:
 Combine keyword matching with AI fallback for optimal responses:
 
 ```html
-<div data-swc 
-     data-swc-theme-color="#6366F1" 
-     data-swc-bot-name="Smart Bot" 
-     data-swc-chat-display="modern"
-     data-swc-api-mode="hybrid"
-     data-swc-api-key="sk-or-v1-..."
-     data-swc-api-model="openai/gpt-3.5-turbo"
-     data-swc-hybrid-threshold="0.3">
-</div>
+<div
+  data-swc
+  data-swc-theme-color="#6366F1"
+  data-swc-bot-name="Smart Bot"
+  data-swc-chat-display="modern"
+  data-swc-api-mode="hybrid"
+  data-swc-api-key="sk-or-v1-..."
+  data-swc-api-model="openai/gpt-3.5-turbo"
+  data-swc-hybrid-threshold="0.3"
+></div>
 ```
 
 **How Hybrid Mode Works:**
+
 1. User sends a message
 2. Chatbot checks keyword knowledge base first
 3. If good match found (score > threshold), uses keyword response
@@ -150,7 +161,7 @@ You can use an external JSON file to define your chatbot's knowledge base. This 
         { "label": "Pricing", "reply_id": "pricing" },
         { "label": "Support", "reply_id": "support" }
       ]
-    },
+    }
     // Add more nodes as needed
   ]
 }
@@ -161,31 +172,41 @@ You can use an external JSON file to define your chatbot's knowledge base. This 
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SenangWebs Chatbot Example</title>
-    <link rel="stylesheet" href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css">
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css"
+    />
     <script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
-</head>
-<body>
-    <div id="chatbot-container" data-swc data-swc-theme-color="#4CAF50" data-swc-bot-name="SenangBot" data-swc-chat-display="modern" data-swc-reply-duration="800"></div>
+  </head>
+  <body>
+    <div
+      id="chatbot-container"
+      data-swc
+      data-swc-theme-color="#4CAF50"
+      data-swc-bot-name="SenangBot"
+      data-swc-chat-display="modern"
+      data-swc-reply-duration="800"
+    ></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            fetch('knowledge-base.json')
-                .then(response => response.json())
-                .then(data => {
-                    initializeChatbot(data.knowledgeBase);
-                })
-                .catch(error => {
-                    console.error('Error loading knowledge base:', error);
-                    // Initialize with default knowledge base if there's an error
-                    initializeChatbot();
-                });
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        fetch("knowledge-base.json")
+          .then((response) => response.json())
+          .then((data) => {
+            initializeChatbot(data.knowledgeBase);
+          })
+          .catch((error) => {
+            console.error("Error loading knowledge base:", error);
+            // Initialize with default knowledge base if there's an error
+            initializeChatbot();
+          });
+      });
     </script>
-</body>
+  </body>
 </html>
 ```
 
@@ -196,6 +217,7 @@ This example demonstrates how to load an external JSON file and use it to initia
 ### Chatbot Container Attributes
 
 #### Basic Attributes
+
 - `data-swc`: Indicates that this element should be initialized as a chatbot
 - `data-swc-theme-color`: Sets the primary color for the chatbot interface (e.g., "#ff6600")
 - `data-swc-bot-name`: Sets the name of the chatbot (e.g., "SenangWebs")
@@ -204,6 +226,7 @@ This example demonstrates how to load an external JSON file and use it to initia
 - `data-swc-load`: Loads chat history from a JSON file path or inline JSON string
 
 #### AI/API Attributes
+
 - `data-swc-api-mode`: Conversation mode - "keyword-only", "ai-only", or "hybrid" (default: "keyword-only")
 - `data-swc-api-key`: OpenRouter API key (required for AI modes)
 - `data-swc-api-model`: AI model to use (e.g., "openai/gpt-3.5-turbo")
@@ -220,16 +243,19 @@ This example demonstrates how to load an external JSON file and use it to initia
 The chatbot supports all OpenRouter-compatible models, including:
 
 **OpenAI Models:**
+
 - `openai/gpt-3.5-turbo` - Fast and cost-effective
 - `openai/gpt-4-turbo` - Most capable, higher cost
 - `openai/gpt-4` - Balanced performance
 
 **Anthropic Claude:**
+
 - `anthropic/claude-3-haiku` - Fast and efficient
 - `anthropic/claude-3-sonnet` - Balanced
 - `anthropic/claude-3-opus` - Most capable
 
 **Open Source Models:**
+
 - `meta-llama/llama-3-8b-instruct` - Free, good performance
 - `meta-llama/llama-3-70b-instruct` - More capable
 - `nvidia/nemotron-nano-12b-v2-vl:free` - Free with vision
@@ -268,7 +294,7 @@ SenangWebs Chatbot includes powerful chat history features that allow you to sav
 Access the chatbot instance to manage history:
 
 ```javascript
-const chatbotElement = document.querySelector('[data-swc]');
+const chatbotElement = document.querySelector("[data-swc]");
 const chatbot = chatbotElement.chatbotInstance;
 
 // Export history as JSON string
@@ -291,19 +317,21 @@ Load chat history directly via HTML data attributes:
 **Load from external JSON file:**
 
 ```html
-<div data-swc 
-     data-swc-load="./path/to/history.json"
-     data-swc-theme-color="#ff6600">
-</div>
+<div
+  data-swc
+  data-swc-load="./path/to/history.json"
+  data-swc-theme-color="#ff6600"
+></div>
 ```
 
 **Load from inline JSON:**
 
 ```html
-<div data-swc 
-     data-swc-load='{"version":"1.0","messages":[...]}'
-     data-swc-theme-color="#ff6600">
-</div>
+<div
+  data-swc
+  data-swc-load='{"version":"1.0","messages":[...]}'
+  data-swc-theme-color="#ff6600"
+></div>
 ```
 
 ### History Data Structure
@@ -323,9 +351,7 @@ The chat history is stored in the following JSON format:
       "type": "bot",
       "content": "<p>Welcome message</p>",
       "nodeId": "welcome",
-      "options": [
-        { "label": "Option 1", "reply_id": "node_1" }
-      ]
+      "options": [{ "label": "Option 1", "reply_id": "node_1" }]
     },
     {
       "id": "msg-1730545810000-def",
@@ -348,24 +374,27 @@ For production use, implement a backend proxy server to handle API requests secu
 
 ```javascript
 // server.js
-const express = require('express');
+const express = require("express");
 const app = express();
 
 app.use(express.json());
 app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+  res.header("Access-Control-Allow-Origin", "*");
   next();
 });
 
-app.post('/api/chat', async (req, res) => {
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(req.body)
-  });
+app.post("/api/chat", async (req, res) => {
+  const response = await fetch(
+    "https://openrouter.ai/api/v1/chat/completions",
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(req.body),
+    }
+  );
 
   const data = await response.json();
   res.json(data);
@@ -402,30 +431,34 @@ curl_close($ch);
 ```javascript
 export default {
   async fetch(request) {
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json'
-      },
-      body: await request.text()
-    });
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: await request.text(),
+      }
+    );
 
     return new Response(await response.text(), {
-      headers: { 'Access-Control-Allow-Origin': '*' }
+      headers: { "Access-Control-Allow-Origin": "*" },
     });
-  }
+  },
 };
 ```
 
 ### Using Proxy in Chatbot
 
 ```html
-<div data-swc 
-     data-swc-api-mode="ai-only"
-     data-swc-api-base-url="https://your-domain.com/api/chat"
-     data-swc-api-key="not-needed-with-proxy">
-</div>
+<div
+  data-swc
+  data-swc-api-mode="ai-only"
+  data-swc-api-base-url="https://your-domain.com/api/chat"
+  data-swc-api-key="not-needed-with-proxy"
+></div>
 ```
 
 See `examples/proxy-servers/` for complete implementation examples.
@@ -438,18 +471,18 @@ The chatbot dispatches custom events for various operations:
 
 ```javascript
 // Listen for history export
-chatbotElement.addEventListener('swc:history-exported', (e) => {
-  console.log('History exported:', e.detail.history);
+chatbotElement.addEventListener("swc:history-exported", (e) => {
+  console.log("History exported:", e.detail.history);
 });
 
 // Listen for history load
-chatbotElement.addEventListener('swc:history-loaded', (e) => {
-  console.log('History loaded:', e.detail.messageCount);
+chatbotElement.addEventListener("swc:history-loaded", (e) => {
+  console.log("History loaded:", e.detail.messageCount);
 });
 
 // Listen for history clear
-chatbotElement.addEventListener('swc:history-cleared', () => {
-  console.log('History cleared');
+chatbotElement.addEventListener("swc:history-cleared", () => {
+  console.log("History cleared");
 });
 ```
 
@@ -457,28 +490,28 @@ chatbotElement.addEventListener('swc:history-cleared', () => {
 
 ```javascript
 // Listen for AI response start
-chatbotElement.addEventListener('swc:ai-response-start', (e) => {
-  console.log('AI started responding');
+chatbotElement.addEventListener("swc:ai-response-start", (e) => {
+  console.log("AI started responding");
 });
 
 // Listen for streaming tokens
-chatbotElement.addEventListener('swc:ai-token', (e) => {
-  console.log('Token received:', e.detail.token);
+chatbotElement.addEventListener("swc:ai-token", (e) => {
+  console.log("Token received:", e.detail.token);
 });
 
 // Listen for AI response complete
-chatbotElement.addEventListener('swc:ai-response-complete', (e) => {
-  console.log('AI response complete:', e.detail.fullResponse);
+chatbotElement.addEventListener("swc:ai-response-complete", (e) => {
+  console.log("AI response complete:", e.detail.fullResponse);
 });
 
 // Listen for AI errors
-chatbotElement.addEventListener('swc:ai-error', (e) => {
-  console.error('AI error:', e.detail.error);
+chatbotElement.addEventListener("swc:ai-error", (e) => {
+  console.error("AI error:", e.detail.error);
 });
 
 // Listen for AI response stopped by user
-chatbotElement.addEventListener('swc:ai-stopped', () => {
-  console.log('AI response stopped by user');
+chatbotElement.addEventListener("swc:ai-stopped", () => {
+  console.log("AI response stopped by user");
 });
 ```
 
@@ -491,11 +524,13 @@ const chatbot = new SenangWebsChatbot(knowledgeBase, botMetadata, apiConfig);
 ```
 
 **Parameters:**
+
 - `knowledgeBase` (Array): Array of conversation nodes for keyword matching
 - `botMetadata` (Object): Bot configuration (name, theme color, etc.)
 - `apiConfig` (Object): API configuration for AI features
 
 **Methods:**
+
 - `handleInput(input)` - Process user text input
 - `handleOptionSelection(replyId)` - Process button click
 - `exportHistory()` - Export chat history as JSON string
@@ -508,15 +543,16 @@ const chatbot = new SenangWebsChatbot(knowledgeBase, botMetadata, apiConfig);
 
 ```javascript
 const api = new OpenRouterAPI({
-  apiKey: 'sk-or-v1-...',
-  model: 'openai/gpt-3.5-turbo',
+  apiKey: "sk-or-v1-...",
+  model: "openai/gpt-3.5-turbo",
   maxTokens: 500,
   temperature: 0.7,
-  streaming: true
+  streaming: true,
 });
 ```
 
 **Methods:**
+
 - `sendMessage(messages, onStream, onComplete, onError)` - Send chat completion request
 - `stopGeneration()` - Abort ongoing API request
 
@@ -527,6 +563,7 @@ const context = new ContextManager({ maxMessages: 10 });
 ```
 
 **Methods:**
+
 - `addMessage(role, content)` - Add message to context
 - `getContext()` - Get formatted context for API
 - `clear()` - Clear all context
@@ -539,15 +576,19 @@ The `examples/` directory contains several demonstration pages:
 ### Basic Examples
 
 #### 1. Simple Chatbot (`examples/basic/01-simple-chatbot.html`)
+
 Traditional keyword-based chatbot with conversation flows and options.
 
 #### 2. Basic Showcase (`examples/index.html`)
+
 Demonstrates modern and classic display styles, theme customization, and basic functionality.
 
 ### Advanced Features
 
 #### 3. Chat History Demo (`examples/advanced-features/01-chat-history.html`)
+
 Interactive demonstration of chat history features:
+
 - Export conversations as JSON files
 - Import and restore from JSON files
 - Clear conversation history
@@ -555,25 +596,32 @@ Interactive demonstration of chat history features:
 - Real-time event logging
 
 #### 4. External Knowledge Base (`examples/advanced-features/02-external-knowledge-base.html`)
+
 Shows how to load conversation flows from external JSON files for easier content management.
 
 ### API Integration Examples
 
 #### 5. AI-Only Mode (`examples/api-integration/01-ai-only-mode.html`)
+
 Pure AI-powered chatbot using OpenRouter API with streaming responses.
 
 #### 6. Hybrid Mode (`examples/api-integration/02-hybrid-mode.html`)
+
 Intelligent fallback system combining keyword matching with AI responses.
 
 #### 7. Interactive Testing (`examples/api-integration/03-interactive-testing.html`)
+
 Full-featured testing environment with:
+
 - API key configuration
 - Model selection (GPT, Claude, Llama, etc.)
 - Mode switching (keyword/AI/hybrid)
 - Real-time testing interface
 
 #### 8. Secure Proxy Setup (`examples/api-integration/04-secure-proxy-setup.html`)
+
 Production-ready proxy implementation examples:
+
 - Node.js Express proxy
 - PHP proxy
 - Cloudflare Workers proxy
@@ -607,7 +655,7 @@ To create a custom knowledge base, follow the structure outlined in the Configur
 ```css
 /* Override chatbot colors */
 [data-swc] {
-  --swc-theme-color: #6366F1;
+  --swc-theme-color: #6366f1;
   --swc-border-radius: 12px;
 }
 
@@ -626,18 +674,21 @@ To create a custom knowledge base, follow the structure outlined in the Configur
 ## Performance Considerations
 
 ### Keyword Mode
+
 - Instant responses (no API calls)
 - No external dependencies
 - Works offline
 - Best for FAQ and guided conversations
 
 ### AI Mode
+
 - Network latency (1-3 seconds typical)
 - API costs per request
 - Requires internet connection
 - Best for open-ended conversations
 
 ### Hybrid Mode
+
 - Best of both worlds
 - Fast keyword responses when possible
 - AI fallback for complex queries
@@ -648,22 +699,26 @@ To create a custom knowledge base, follow the structure outlined in the Configur
 ### Common Issues
 
 **AI responses not working:**
+
 - Check API key is valid
 - Verify `data-swc-api-mode` is set to "ai-only" or "hybrid"
 - Check browser console for errors
 - Ensure CORS is configured if using custom proxy
 
 **Streaming not working:**
+
 - Verify `data-swc-api-streaming="true"`
 - Check browser supports ReadableStream API
 - Some proxies may buffer responses
 
 **Keyword matching too strict:**
+
 - Lower `data-swc-hybrid-threshold` (default: 0.3)
 - Add more keyword variations to knowledge base
 - Use partial keywords for better matching
 
 **High API costs:**
+
 - Use hybrid mode instead of ai-only
 - Reduce `data-swc-api-max-tokens`
 - Use cheaper models (gpt-3.5-turbo)
@@ -680,13 +735,6 @@ SenangWebs Chatbot works on all modern browsers, including:
 - Opera 76+
 
 **Note:** Streaming responses require browsers with ReadableStream support (all modern browsers).
-
-## Roadmap
-
-- [ ] Voice input support
-- [ ] Multi-language support
-- [ ] Rich media messages (images, videos)
-- [ ] User authentication integration
 
 ## Contributing
 
