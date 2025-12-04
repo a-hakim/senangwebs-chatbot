@@ -282,18 +282,21 @@ class SenangWebsChatbot {
       }
       const messages = this.contextManager.getContext(true);
 
-      // Trigger onStart callback
-      if (callbacks.onStart) {
-        callbacks.onStart();
-      }
+      // onStart callback will be triggered on first chunk, not here
 
       let fullResponse = "";
+      let onStartCalled = false;
 
       // Send message with streaming
       const result = await this.apiClient.sendMessage(
         messages,
         // onChunk callback
         (chunk) => {
+          // Trigger onStart on first chunk (when streaming actually begins)
+          if (!onStartCalled && callbacks.onStart) {
+            callbacks.onStart();
+            onStartCalled = true;
+          }
           fullResponse = chunk.fullContent;
           if (callbacks.onChunk) {
             callbacks.onChunk(chunk);
@@ -862,7 +865,7 @@ function initializeChatbot(customKnowledgeBase = null) {
     function createStopButton() {
       const stopBtn = document.createElement("button");
       stopBtn.className = "swc-stop-button";
-      stopBtn.innerHTML = "⏹ Stop";
+      stopBtn.innerHTML = "Stop";
       stopBtn.onclick = () => {
         chatbot.cancelAIResponse();
         stopBtn.remove();
@@ -894,7 +897,7 @@ function initializeChatbot(customKnowledgeBase = null) {
         if (isAIEnabled && replyDuration === 0) {
           // For AI responses, add delay then proceed
           setTimeout(async () => {
-            removeTypingIndicator();
+            // Typing indicator stays visible until onStart is triggered
 
             // Create streaming message element
             let streamingMessage = null;
@@ -902,6 +905,8 @@ function initializeChatbot(customKnowledgeBase = null) {
 
             const response = await chatbot.handleInput(message, {
               onStart: () => {
+                // Remove typing indicator now that streaming is starting
+                removeTypingIndicator();
                 // Create message element for streaming
                 streamingMessage = displayBotMessage("", null, true, "api");
 
@@ -917,8 +922,10 @@ function initializeChatbot(customKnowledgeBase = null) {
               onChunk: (chunk) => {
                 // Update streaming message with escaped content to prevent XSS
                 if (streamingMessage) {
-                  streamingMessage.textContent = chunk.fullContent;
-                  smoothScrollToBottom(chatDisplay);
+                  requestAnimationFrame(() => {
+                    streamingMessage.textContent = chunk.fullContent;
+                    smoothScrollToBottom(chatDisplay);
+                  });
                 }
               },
               onComplete: (result) => {
@@ -976,11 +983,13 @@ function initializeChatbot(customKnowledgeBase = null) {
     function handleOptionClick(replyId) {
       disableUserInput();
       showTypingIndicator();
+      // Use minimum 500ms delay for option clicks to show typing indicator
+      const optionDelay = Math.max(replyDuration, 500);
       setTimeout(() => {
         const response = chatbot.handleOptionSelection(replyId);
         displayBotMessage(response.reply, response.options);
         enableUserInput();
-      }, replyDuration);
+      }, optionDelay);
     }
 
     function disableUserInput() {
