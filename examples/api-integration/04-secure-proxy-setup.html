@@ -1,232 +1,288 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Secure Proxy Example | SenangWebs Chatbot</title>
-    <link rel="stylesheet" href="../../dist/swc.css">
+    <link rel="stylesheet" href="../../dist/swc.css" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="../../dist/swc.js"></script>
-</head>
+  </head>
 
-<body class="bg-gray-100">
-
+  <body class="bg-gray-100">
     <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2">Secure Proxy Configuration</h1>
+        <p class="text-gray-600 mb-4">
+          Using a server-side proxy to keep your API key secure
+        </p>
 
-        <div class="mb-8">
-            <h1 class="text-3xl font-bold mb-2">Secure Proxy Configuration</h1>
-            <p class="text-gray-600 mb-4">Using a server-side proxy to keep your API key secure</p>
-            
-            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-yellow-800">Security Best Practice</h3>
-                        <div class="mt-2 text-sm text-yellow-700">
-                            <p>This example uses a proxy server to keep your API key secure. The API key never reaches the client browser.</p>
-                        </div>
-                    </div>
-                </div>
+        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg
+                class="h-5 w-5 text-yellow-400"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+              >
+                <path
+                  fill-rule="evenodd"
+                  d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                  clip-rule="evenodd"
+                />
+              </svg>
             </div>
-        </div>
-
-        <!-- Security Tips -->
-        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-8">
-            <div class="flex">
-                <div class="flex-shrink-0">
-                    <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clip-rule="evenodd" />
-                    </svg>
-                </div>
-                <div class="ml-3">
-                    <h3 class="text-sm font-medium text-red-800">Security Checklist</h3>
-                    <div class="mt-2 text-sm text-red-700">
-                        <ul class="list-disc list-inside space-y-1">
-                            <li><strong>Never</strong> commit API keys to version control</li>
-                            <li>Use environment variables for sensitive data</li>
-                            <li>Implement rate limiting on your proxy</li>
-                            <li>Add authentication if needed</li>
-                            <li>Use HTTPS in production</li>
-                            <li>Restrict CORS to your domain only</li>
-                            <li>Monitor API usage and costs</li>
-                            <li>Log requests for debugging and security audits</li>
-                        </ul>
-                    </div>
-                </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-yellow-800">
+                Security Best Practice
+              </h3>
+              <div class="mt-2 text-sm text-yellow-700">
+                <p>
+                  This example uses a proxy server to keep your API key secure.
+                  The API key never reaches the client browser.
+                </p>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
 
-        <!-- Chatbot Demo -->
-        <div class="grid md:grid-cols-2 gap-8 mb-8">
-            <div>
-                <h2 class="text-xl font-bold mb-4">🔐 Secure Chatbot</h2>
-                <div class="bg-white border border-neutral-200 rounded-lg p-4">
-                    <!-- 
+      <!-- Security Tips -->
+      <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-8">
+        <div class="flex">
+          <div class="flex-shrink-0">
+            <svg
+              class="h-5 w-5 text-red-400"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <div class="ml-3">
+            <h3 class="text-sm font-medium text-red-800">Security Checklist</h3>
+            <div class="mt-2 text-sm text-red-700">
+              <ul class="list-disc list-inside space-y-1">
+                <li>
+                  <strong>Never</strong> commit API keys to version control
+                </li>
+                <li>Use environment variables for sensitive data</li>
+                <li>Implement rate limiting on your proxy</li>
+                <li>Add authentication if needed</li>
+                <li>Use HTTPS in production</li>
+                <li>Restrict CORS to your domain only</li>
+                <li>Monitor API usage and costs</li>
+                <li>Log requests for debugging and security audits</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chatbot Demo -->
+      <div class="grid md:grid-cols-2 gap-8 mb-8">
+        <div>
+          <h2 class="text-xl font-bold mb-4">🔐 Secure Chatbot</h2>
+          <div class="bg-white border border-neutral-200 rounded-lg p-4">
+            <!-- 
                         Notice: No data-swc-api-key attribute!
                         The API key is stored securely on your server.
                     -->
-                    <div data-swc 
-                         data-swc-theme-color="#10B981" 
-                         data-swc-bot-name="Secure Assistant" 
-                         data-swc-chat-display="modern"
-                         data-swc-api-mode="ai-only"
-                         data-swc-api-base-url="http://localhost:3000/api/chat"
-                         data-swc-api-model="openai/gpt-3.5-turbo"
-                         data-swc-api-streaming="true"
-                         data-swc-system-prompt="You are a helpful assistant.">
-                    </div>
-                </div>
-                <div class="mt-3 text-sm text-gray-600">
-                    <p>✅ API key stored on server</p>
-                    <p>✅ Secure communication</p>
-                    <p>✅ Production-ready</p>
-                </div>
-            </div>
-
-            <div>
-                <h2 class="text-xl font-bold mb-4">📚 Setup Instructions</h2>
-                <div class="bg-white border border-neutral-200 rounded-lg p-4 space-y-4">
-                    <div>
-                        <h3 class="font-semibold text-green-600 mb-2">1. Choose Your Proxy</h3>
-                        <ul class="text-sm space-y-1 text-gray-700">
-                            <li>• <strong>Node.js:</strong> proxy-nodejs.js</li>
-                            <li>• <strong>PHP:</strong> proxy-php.php</li>
-                            <li>• <strong>Cloudflare:</strong> proxy-cloudflare-worker.js</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-blue-600 mb-2">2. Set API Key</h3>
-                        <ul class="text-sm space-y-1 text-gray-700">
-                            <li>• Use environment variables</li>
-                            <li>• Never commit keys to git</li>
-                            <li>• Keep keys secure on server</li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3 class="font-semibold text-purple-600 mb-2">3. Configure Chatbot</h3>
-                        <ul class="text-sm space-y-1 text-gray-700">
-                            <li>• Point to your proxy URL</li>
-                            <li>• Remove API key from HTML</li>
-                            <li>• Test the connection</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
+            <div
+              data-swc
+              data-swc-theme-color="#10B981"
+              data-swc-bot-name="Secure Assistant (API)"
+              data-swc-chat-display="modern"
+              data-swc-api-mode="ai-only"
+              data-swc-api-base-url="../examples/proxy-servers/proxy-php.php"
+              data-swc-api-model="openai/gpt-3.5-turbo"
+              data-swc-api-streaming="true"
+              data-swc-system-prompt="You are a helpful assistant."
+            ></div>
+          </div>
+          <div class="mt-3 text-sm text-gray-600">
+            <p>✅ API key stored on server</p>
+            <p>✅ Secure communication</p>
+            <p>✅ Production-ready</p>
+          </div>
         </div>
 
-        <!-- Code Examples -->
-        <div class="space-y-6">
-            
-            <!-- Node.js Example -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-bold mb-4">Node.js/Express Proxy</h2>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">1. Install Dependencies:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>npm install express node-fetch</code></pre>
-                </div>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">2. Set Environment Variable:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code># Windows
+        <div>
+          <h2 class="text-xl font-bold mb-4">📚 Setup Instructions</h2>
+          <div
+            class="bg-white border border-neutral-200 rounded-lg p-4 space-y-4"
+          >
+            <div>
+              <h3 class="font-semibold text-green-600 mb-2">
+                1. Choose Your Proxy
+              </h3>
+              <ul class="text-sm space-y-1 text-gray-700">
+                <li>• <strong>Node.js:</strong> proxy-nodejs.js</li>
+                <li>• <strong>PHP:</strong> proxy-php.php</li>
+                <li>
+                  • <strong>Cloudflare:</strong> proxy-cloudflare-worker.js
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="font-semibold text-blue-600 mb-2">2. Set API Key</h3>
+              <ul class="text-sm space-y-1 text-gray-700">
+                <li>• Use environment variables</li>
+                <li>• Never commit keys to git</li>
+                <li>• Keep keys secure on server</li>
+              </ul>
+            </div>
+            <div>
+              <h3 class="font-semibold text-purple-600 mb-2">
+                3. Configure Chatbot
+              </h3>
+              <ul class="text-sm space-y-1 text-gray-700">
+                <li>• Point to your proxy URL</li>
+                <li>• Remove API key from HTML</li>
+                <li>• Test the connection</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code Examples -->
+      <div class="space-y-6">
+        <!-- Node.js Example -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Node.js/Express Proxy</h2>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">1. Install Dependencies:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>npm install express node-fetch</code></pre>
+          </div>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">2. Set Environment Variable:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code># Windows
 set OPENROUTER_API_KEY=your-api-key-here
 
 # Linux/Mac
 export OPENROUTER_API_KEY=your-api-key-here</code></pre>
-                </div>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">3. Run Server:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>node proxy-nodejs.js</code></pre>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-2">4. Configure Chatbot:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>&lt;div data-swc 
+          </div>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">3. Run Server:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>node proxy-nodejs.js</code></pre>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-2">4. Configure Chatbot:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>&lt;div data-swc 
      data-swc-api-mode="ai-only"
      data-swc-api-base-url="http://localhost:3000/api/chat"
      data-swc-api-model="openai/gpt-3.5-turbo"&gt;
 &lt;/div&gt;</code></pre>
-                </div>
-            </div>
+          </div>
+        </div>
 
-            <!-- PHP Example -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-bold mb-4">PHP Proxy</h2>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">1. Upload proxy-php.php to your server</h3>
-                </div>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">2. Set API Key in .env or code:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>// In proxy-php.php
+        <!-- PHP Example -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-bold mb-4">PHP Proxy</h2>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">
+              1. Upload proxy-php.php to your server
+            </h3>
+          </div>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">2. Set API Key in .env or code:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>// In proxy-php.php
 define('OPENROUTER_API_KEY', 'your-api-key-here');</code></pre>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-2">3. Configure Chatbot:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>&lt;div data-swc 
+          </div>
+          <div>
+            <h3 class="font-semibold mb-2">3. Configure Chatbot:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>&lt;div data-swc 
      data-swc-api-mode="ai-only"
      data-swc-api-base-url="https://yourdomain.com/api/chat.php"
      data-swc-api-model="openai/gpt-3.5-turbo"&gt;
 &lt;/div&gt;</code></pre>
-                </div>
-            </div>
+          </div>
+        </div>
 
-            <!-- Cloudflare Example -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-xl font-bold mb-4">Cloudflare Workers Proxy</h2>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">1. Install Wrangler CLI:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>npm install -g wrangler</code></pre>
-                </div>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">2. Set API Key Secret:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>wrangler secret put OPENROUTER_API_KEY</code></pre>
-                </div>
-                <div class="mb-4">
-                    <h3 class="font-semibold mb-2">3. Deploy Worker:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>wrangler deploy</code></pre>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-2">4. Configure Chatbot:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>&lt;div data-swc 
+        <!-- Cloudflare Example -->
+        <div class="bg-white rounded-lg shadow-lg p-6">
+          <h2 class="text-xl font-bold mb-4">Cloudflare Workers Proxy</h2>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">1. Install Wrangler CLI:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>npm install -g wrangler</code></pre>
+          </div>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">2. Set API Key Secret:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>wrangler secret put OPENROUTER_API_KEY</code></pre>
+          </div>
+          <div class="mb-4">
+            <h3 class="font-semibold mb-2">3. Deploy Worker:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>wrangler deploy</code></pre>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-2">4. Configure Chatbot:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>&lt;div data-swc 
      data-swc-api-mode="ai-only"
      data-swc-api-base-url="https://your-worker.workers.dev/chat"
      data-swc-api-model="openai/gpt-3.5-turbo"&gt;
 &lt;/div&gt;</code></pre>
-                </div>
-            </div>
-
+          </div>
         </div>
+      </div>
 
-        <!-- Testing Section -->
-        <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
-            <h2 class="text-xl font-bold mb-4">Testing Your Proxy</h2>
-            <div class="space-y-3">
-                <div>
-                    <h3 class="font-semibold mb-2">1. Test Health Endpoint:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>curl http://localhost:3000/api/health</code></pre>
-                    <p class="text-sm text-gray-600 mt-2">Expected: <code>{"status":"ok","timestamp":"..."}</code></p>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-2">2. Test Chat Endpoint:</h3>
-                    <pre class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"><code>curl -X POST http://localhost:3000/api/chat \
+      <!-- Testing Section -->
+      <div class="bg-white rounded-lg shadow-lg p-6 mt-6">
+        <h2 class="text-xl font-bold mb-4">Testing Your Proxy</h2>
+        <div class="space-y-3">
+          <div>
+            <h3 class="font-semibold mb-2">1. Test Health Endpoint:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>curl http://localhost:3000/api/health</code></pre>
+            <p class="text-sm text-gray-600 mt-2">
+              Expected: <code>{"status":"ok","timestamp":"..."}</code>
+            </p>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-2">2. Test Chat Endpoint:</h3>
+            <pre
+              class="bg-gray-900 text-gray-100 p-4 rounded overflow-x-auto text-sm"
+            ><code>curl -X POST http://localhost:3000/api/chat \
   -H "Content-Type: application/json" \
   -d '{
     "model": "openai/gpt-3.5-turbo",
     "messages": [{"role": "user", "content": "Hello!"}],
     "stream": false
   }'</code></pre>
-                </div>
-                <div>
-                    <h3 class="font-semibold mb-2">3. Check Browser Console:</h3>
-                    <p class="text-sm text-gray-600">Open DevTools (F12) and verify no API keys appear in Network tab</p>
-                </div>
-            </div>
+          </div>
+          <div>
+            <h3 class="font-semibold mb-2">3. Check Browser Console:</h3>
+            <p class="text-sm text-gray-600">
+              Open DevTools (F12) and verify no API keys appear in Network tab
+            </p>
+          </div>
         </div>
-
+      </div>
     </main>
-
-</body>
-
+  </body>
 </html>

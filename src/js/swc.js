@@ -742,11 +742,12 @@ function initializeChatbot(customKnowledgeBase = null) {
     const apiBaseURL = element.getAttribute("data-swc-api-base-url");
     const hybridThreshold = element.getAttribute("data-swc-hybrid-threshold");
 
-    // Build API config object if API key is provided
+    // Build API config object if API key OR custom base URL is provided
+    // (proxy setups use custom base URL and don't need client-side API key)
     let apiConfig = null;
-    if (apiKey && apiMode !== "keyword-only") {
+    if ((apiKey || apiBaseURL) && apiMode !== "keyword-only") {
       apiConfig = {
-        apiKey: apiKey,
+        apiKey: apiKey || "proxy-mode", // Use placeholder for proxy mode
         mode: apiMode || "hybrid",
         model: apiModel || "openai/gpt-3.5-turbo",
         streaming: apiStreaming !== "false",
@@ -760,8 +761,8 @@ function initializeChatbot(customKnowledgeBase = null) {
         siteUrl: window.location.origin,
       };
 
-      // Show warning about client-side API key
-      if (!apiBaseURL || apiBaseURL.includes("openrouter.ai")) {
+      // Show warning about client-side API key only if directly using OpenRouter
+      if (apiKey && (!apiBaseURL || apiBaseURL.includes("openrouter.ai"))) {
         console.warn(
           "[SWC] ⚠️ API key is exposed in client-side code. For production, use a server-side proxy."
         );

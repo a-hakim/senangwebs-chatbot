@@ -13,13 +13,13 @@
  */
 
 // Configuration
-define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: 'your-api-key-here');
+define('OPENROUTER_API_KEY', getenv('OPENROUTER_API_KEY') ?: 'YOUR_OPENROUTER_API_KEY_HERE');
 define('OPENROUTER_BASE_URL', 'https://openrouter.ai/api/v1');
 
 // CORS Headers - adjust for production
 header('Access-Control-Allow-Origin: *'); // Change to your domain in production
-header('Access-Control-Allow-Methods: POST, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, HTTP-Referer, X-Title');
 
 // Handle preflight
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -27,17 +27,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit;
 }
 
-// Only accept POST requests
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    echo json_encode(['error' => 'Method not allowed']);
+// Parse the request path to handle routes
+// The chatbot client appends /chat/completions to the base URL
+$requestUri = $_SERVER['REQUEST_URI'];
+$scriptName = $_SERVER['SCRIPT_NAME'];
+
+// Get the path after the PHP file (e.g., /chat/completions)
+$pathInfo = '';
+if (isset($_SERVER['PATH_INFO'])) {
+    $pathInfo = $_SERVER['PATH_INFO'];
+} else {
+    // Fallback: extract path from REQUEST_URI
+    $pos = strpos($requestUri, $scriptName);
+    if ($pos !== false) {
+        $pathInfo = substr($requestUri, $pos + strlen($scriptName));
+        // Remove query string if present
+        if (($qpos = strpos($pathInfo, '?')) !== false) {
+            $pathInfo = substr($pathInfo, 0, $qpos);
+        }
+    }
+}
+
+// Route handling
+// Accept both direct POST (for backward compatibility) and /chat/completions path
+$validPaths = ['', '/', '/chat/completions'];
+if (!in_array($pathInfo, $validPaths)) {
+    http_response_code(404);
+    echo json_encode(['error' => 'Not found', 'path' => $pathInfo]);
     exit;
 }
 
-// Validate API key
-if (OPENROUTER_API_KEY === 'your-api-key-here') {
-    http_response_code(500);
-    echo json_encode(['error' => 'API key not configured']);
+// Only accept POST requests for chat endpoint
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    // Allow GET for health check
+    if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        header('Content-Type: application/json');
+        echo json_encode(['status' => 'ok', 'timestamp' => date('c')]);
+        exit;
+    }
+    http_response_code(405);
+    echo json_encode(['error' => 'Method not allowed']);
     exit;
 }
 
@@ -74,6 +103,11 @@ $requestBody = [
 // Initialize cURL
 $ch = curl_init(OPENROUTER_BASE_URL . '/chat/completions');
 
+// SSL Configuration - For production, ensure proper CA certificates are installed
+// On Windows/dev environments, you may need to set CURLOPT_CAINFO to a CA bundle path
+// e.g., CURLOPT_CAINFO => 'C:/path/to/cacert.pem'
+// Download from: https://curl.se/ca/cacert.pem
+
 curl_setopt_array($ch, [
     CURLOPT_RETURNTRANSFER => true,
     CURLOPT_POST => true,
@@ -84,6 +118,9 @@ curl_setopt_array($ch, [
         'HTTP-Referer: ' . ($_SERVER['HTTP_REFERER'] ?? $_SERVER['HTTP_HOST']),
         'X-Title: SenangWebs Chatbot'
     ],
+    // SSL options - set to true and configure CURLOPT_CAINFO for production
+    CURLOPT_SSL_VERIFYPEER => false, // Set to true in production with proper CA certificates
+    CURLOPT_SSL_VERIFYHOST => 0,     // Set to 2 in production
     CURLOPT_WRITEFUNCTION => function($ch, $data) use ($requestBody) {
         // Handle streaming response
         if ($requestBody['stream']) {
