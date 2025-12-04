@@ -7,7 +7,7 @@
 class ContextManager {
   constructor(config = {}) {
     this.maxMessages = config.maxMessages || 10;
-    this.systemPrompt = config.systemPrompt || 'You are a helpful assistant.';
+    this.systemPrompt = config.systemPrompt || "You are a helpful assistant.";
     this.contextWindow = [];
     this.totalTokensEstimate = 0;
     this.maxTokens = config.maxTokens || 2000; // Context token limit
@@ -21,7 +21,9 @@ class ContextManager {
    */
   addMessage(role, content) {
     if (!role || !content) {
-      console.warn('[ContextManager] Invalid message: role and content are required');
+      console.warn(
+        "[ContextManager] Invalid message: role and content are required"
+      );
       return;
     }
 
@@ -29,15 +31,19 @@ class ContextManager {
       role: role,
       content: content,
       timestamp: new Date().toISOString(),
-      tokens: this._estimateTokens(content)
+      tokens: this._estimateTokens(content),
     };
 
     this.contextWindow.push(message);
     this.totalTokensEstimate += message.tokens;
 
     if (this.debug) {
-      console.log(`[ContextManager] Added ${role} message (${message.tokens} tokens)`);
-      console.log(`[ContextManager] Total messages: ${this.contextWindow.length}, estimated tokens: ${this.totalTokensEstimate}`);
+      console.log(
+        `[ContextManager] Added ${role} message (${message.tokens} tokens)`
+      );
+      console.log(
+        `[ContextManager] Total messages: ${this.contextWindow.length}, estimated tokens: ${this.totalTokensEstimate}`
+      );
     }
 
     // Trim context if needed
@@ -55,21 +61,23 @@ class ContextManager {
     // Add system prompt if requested
     if (includeSystem && this.systemPrompt) {
       messages.push({
-        role: 'system',
-        content: this.systemPrompt
+        role: "system",
+        content: this.systemPrompt,
       });
     }
 
     // Add context window messages (without metadata)
-    this.contextWindow.forEach(msg => {
+    this.contextWindow.forEach((msg) => {
       messages.push({
         role: msg.role,
-        content: msg.content
+        content: msg.content,
       });
     });
 
     if (this.debug) {
-      console.log(`[ContextManager] Returning ${messages.length} messages for API`);
+      console.log(
+        `[ContextManager] Returning ${messages.length} messages for API`
+      );
     }
 
     return messages;
@@ -92,7 +100,7 @@ class ContextManager {
     this.totalTokensEstimate = 0;
 
     if (this.debug) {
-      console.log('[ContextManager] Context cleared');
+      console.log("[ContextManager] Context cleared");
     }
   }
 
@@ -102,9 +110,9 @@ class ContextManager {
    */
   setSystemPrompt(prompt) {
     this.systemPrompt = prompt;
-    
+
     if (this.debug) {
-      console.log('[ContextManager] System prompt updated');
+      console.log("[ContextManager] System prompt updated");
     }
   }
 
@@ -118,7 +126,9 @@ class ContextManager {
       estimatedTokens: this.totalTokensEstimate,
       maxMessages: this.maxMessages,
       maxTokens: this.maxTokens,
-      systemPrompt: this.systemPrompt ? this.systemPrompt.substring(0, 50) + '...' : null
+      systemPrompt: this.systemPrompt
+        ? this.systemPrompt.substring(0, 50) + "..."
+        : null,
     };
   }
 
@@ -132,20 +142,33 @@ class ContextManager {
     // Trim by message count
     while (this.contextWindow.length > this.maxMessages) {
       const removed = this.contextWindow.shift();
-      this.totalTokensEstimate -= removed.tokens;
+      this.totalTokensEstimate = Math.max(
+        0,
+        this.totalTokensEstimate - removed.tokens
+      );
 
       if (this.debug) {
-        console.log(`[ContextManager] Removed oldest message (${removed.role}), ${this.contextWindow.length} remaining`);
+        console.log(
+          `[ContextManager] Removed oldest message (${removed.role}), ${this.contextWindow.length} remaining`
+        );
       }
     }
 
     // Trim by token count (more aggressive if needed)
-    while (this.totalTokensEstimate > this.maxTokens && this.contextWindow.length > 2) {
+    while (
+      this.totalTokensEstimate > this.maxTokens &&
+      this.contextWindow.length > 2
+    ) {
       const removed = this.contextWindow.shift();
-      this.totalTokensEstimate -= removed.tokens;
+      this.totalTokensEstimate = Math.max(
+        0,
+        this.totalTokensEstimate - removed.tokens
+      );
 
       if (this.debug) {
-        console.log(`[ContextManager] Removed message to reduce tokens (${removed.role}), ${this.totalTokensEstimate} tokens remaining`);
+        console.log(
+          `[ContextManager] Removed message to reduce tokens (${removed.role}), ${this.totalTokensEstimate} tokens remaining`
+        );
       }
     }
   }
@@ -157,7 +180,7 @@ class ContextManager {
    */
   _estimateTokens(text) {
     if (!text) return 0;
-    
+
     // Rough estimation: 1 token ≈ 4 characters for English text
     // This is a simplified approach; real tokenization is more complex
     return Math.ceil(text.length / 4);
@@ -170,17 +193,24 @@ class ContextManager {
    */
   summarize() {
     if (this.contextWindow.length < 3) {
-      return '';
+      return "";
     }
 
     // Get first half of messages
-    const messagesToSummarize = this.contextWindow.slice(0, Math.floor(this.contextWindow.length / 2));
-    
+    const messagesToSummarize = this.contextWindow.slice(
+      0,
+      Math.floor(this.contextWindow.length / 2)
+    );
+
     // Create summary
-    const summary = messagesToSummarize.map(msg => {
-      const preview = msg.content.substring(0, 100);
-      return `${msg.role}: ${preview}${msg.content.length > 100 ? '...' : ''}`;
-    }).join('\n');
+    const summary = messagesToSummarize
+      .map((msg) => {
+        const preview = msg.content.substring(0, 100);
+        return `${msg.role}: ${preview}${
+          msg.content.length > 100 ? "..." : ""
+        }`;
+      })
+      .join("\n");
 
     return `Previous conversation summary:\n${summary}`;
   }
@@ -191,17 +221,17 @@ class ContextManager {
    */
   export() {
     return {
-      version: '1.0',
+      version: "1.0",
       timestamp: new Date().toISOString(),
       systemPrompt: this.systemPrompt,
       maxMessages: this.maxMessages,
       maxTokens: this.maxTokens,
-      contextWindow: this.contextWindow.map(msg => ({
+      contextWindow: this.contextWindow.map((msg) => ({
         role: msg.role,
         content: msg.content,
-        timestamp: msg.timestamp
+        timestamp: msg.timestamp,
       })),
-      stats: this.getStats()
+      stats: this.getStats(),
     };
   }
 
@@ -213,7 +243,7 @@ class ContextManager {
   import(data) {
     try {
       if (!data || !data.contextWindow || !Array.isArray(data.contextWindow)) {
-        throw new Error('Invalid context data format');
+        throw new Error("Invalid context data format");
       }
 
       // Clear existing context
@@ -231,18 +261,19 @@ class ContextManager {
       }
 
       // Import messages
-      data.contextWindow.forEach(msg => {
+      data.contextWindow.forEach((msg) => {
         this.addMessage(msg.role, msg.content);
       });
 
       if (this.debug) {
-        console.log(`[ContextManager] Imported ${this.contextWindow.length} messages`);
+        console.log(
+          `[ContextManager] Imported ${this.contextWindow.length} messages`
+        );
       }
 
       return true;
-
     } catch (error) {
-      console.error('[ContextManager] Import failed:', error);
+      console.error("[ContextManager] Import failed:", error);
       return false;
     }
   }
@@ -258,12 +289,12 @@ class ContextManager {
     this.setSystemPrompt(enhancedPrompt);
 
     if (this.debug) {
-      console.log('[ContextManager] Knowledge injected into system prompt');
+      console.log("[ContextManager] Knowledge injected into system prompt");
     }
   }
 }
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
+if (typeof module !== "undefined" && module.exports) {
   module.exports = ContextManager;
 }
