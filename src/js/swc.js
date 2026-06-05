@@ -1,4 +1,5 @@
 // SenangWebs Chatbot Library
+import "../css/swc.css";
 
 // Import API classes if they exist (for modular usage)
 // These classes can also be included separately in HTML

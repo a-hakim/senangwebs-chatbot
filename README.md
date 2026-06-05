@@ -48,6 +48,24 @@ SenangWebs Chatbot is a lightweight JavaScript library that enables easy integra
 npm install senangwebs-chatbot
 ```
 
+Import the JavaScript bundle and stylesheet from the package:
+
+```javascript
+import * as SWC from "senangwebs-chatbot";
+import "senangwebs-chatbot/dist/swc.css";
+
+const { initializeChatbot, SenangWebsChatbot, defaultKnowledgeBase } = SWC;
+```
+
+The package ships readable and minified browser assets:
+`dist/swc.css`, `dist/swc.min.css`, `dist/swc.js`, and `dist/swc.min.js`.
+
+For CommonJS:
+
+```javascript
+const { initializeChatbot, SenangWebsChatbot, defaultKnowledgeBase } = require("senangwebs-chatbot");
+```
+
 ### Using a CDN
 
 You can include SenangWebs Chatbot directly in your HTML file using unpkg:
@@ -55,9 +73,9 @@ You can include SenangWebs Chatbot directly in your HTML file using unpkg:
 ```html
 <link
   rel="stylesheet"
-  href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css"
+  href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.min.css"
 />
-<script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
+<script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.min.js"></script>
 ```
 
 ## Basic Usage
@@ -232,11 +250,11 @@ This example demonstrates how to load an external JSON file and use it to initia
 - `data-swc-api-model`: AI model to use (e.g., "openai/gpt-3.5-turbo")
 - `data-swc-api-streaming`: Enable streaming responses (true/false, default: true)
 - `data-swc-system-prompt`: Custom system prompt for AI personality
-- `data-swc-api-base-url`: Custom API endpoint (default: OpenRouter)
+- `data-swc-api-base-url`: Custom OpenRouter-compatible API root or proxy endpoint (default: OpenRouter)
 - `data-swc-api-max-tokens`: Maximum tokens in AI response (default: 500)
 - `data-swc-api-temperature`: AI creativity level 0-2 (default: 0.7)
 - `data-swc-hybrid-threshold`: Keyword match threshold for hybrid mode (default: 0.3)
-- `data-swc-context-window`: Number of messages to keep in context (default: 10)
+- `data-swc-context-max-messages`: Number of messages to keep in context (default: 10)
 
 ### Supported AI Models
 
@@ -457,7 +475,6 @@ export default {
   data-swc
   data-swc-api-mode="ai-only"
   data-swc-api-base-url="https://your-domain.com/api/chat"
-  data-swc-api-key="not-needed-with-proxy"
 ></div>
 ```
 
@@ -486,34 +503,7 @@ chatbotElement.addEventListener("swc:history-cleared", () => {
 });
 ```
 
-### AI Response Events
-
-```javascript
-// Listen for AI response start
-chatbotElement.addEventListener("swc:ai-response-start", (e) => {
-  console.log("AI started responding");
-});
-
-// Listen for streaming tokens
-chatbotElement.addEventListener("swc:ai-token", (e) => {
-  console.log("Token received:", e.detail.token);
-});
-
-// Listen for AI response complete
-chatbotElement.addEventListener("swc:ai-response-complete", (e) => {
-  console.log("AI response complete:", e.detail.fullResponse);
-});
-
-// Listen for AI errors
-chatbotElement.addEventListener("swc:ai-error", (e) => {
-  console.error("AI error:", e.detail.error);
-});
-
-// Listen for AI response stopped by user
-chatbotElement.addEventListener("swc:ai-stopped", () => {
-  console.log("AI response stopped by user");
-});
-```
+AI responses can be observed through the `handleInput` callback hooks: `onStart`, `onChunk`, `onComplete`, and `onError`.
 
 ## API Reference
 
@@ -537,7 +527,8 @@ const chatbot = new SenangWebsChatbot(knowledgeBase, botMetadata, apiConfig);
 - `loadHistory(data)` - Load chat history from JSON
 - `clearHistory()` - Clear all chat history
 - `getHistory()` - Get current history object
-- `stopAIResponse()` - Stop ongoing AI generation
+- `getAPIStatus()` - Get API configuration and response status
+- `cancelAIResponse()` - Stop ongoing AI generation
 
 ### OpenRouterAPI Class
 
@@ -554,7 +545,8 @@ const api = new OpenRouterAPI({
 **Methods:**
 
 - `sendMessage(messages, onStream, onComplete, onError)` - Send chat completion request
-- `stopGeneration()` - Abort ongoing API request
+- `cancel()` - Abort ongoing API request
+- `getModelInfo()` - Get model, token, and temperature settings
 
 ### ContextManager Class
 
@@ -567,7 +559,7 @@ const context = new ContextManager({ maxMessages: 10 });
 - `addMessage(role, content)` - Add message to context
 - `getContext()` - Get formatted context for API
 - `clear()` - Clear all context
-- `getMessageCount()` - Get number of messages in context
+- `getStats()` - Get message, token, and limit statistics
 
 ## Examples
 
