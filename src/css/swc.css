@@ -26,10 +26,13 @@
   padding: 8px 12px;
   border-radius: 12px;
   max-width: 80%;
-  animation: fadeIn 0.3s ease-out;
+  animation: swc-fade-in 0.3s ease-out;
+  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
 }
 
-@keyframes fadeIn {
+@keyframes swc-fade-in {
   from {
     opacity: 0;
     transform: translateY(10px);
@@ -82,13 +85,15 @@
 }
 
 .swc-user-input {
+  min-width: 0;
   flex-grow: 1;
   padding: 8px 16px;
   border: none;
 }
 
 .swc-user-input:focus {
-  outline: none;
+  outline: 2px solid #1f2937;
+  outline-offset: -2px;
 }
 
 .swc-user-input:disabled {
@@ -150,7 +155,7 @@
   background-color: #666;
   border-radius: 50%;
   display: inline-block;
-  animation: pulse 1s infinite;
+  animation: swc-pulse 1s infinite;
 }
 
 .swc-typing-indicator span:nth-child(2) {
@@ -161,7 +166,7 @@
   animation-delay: 0.4s;
 }
 
-@keyframes pulse {
+@keyframes swc-pulse {
   0%,
   100% {
     transform: scale(1);
@@ -192,11 +197,11 @@
 
 .swc-streaming::after {
   content: "";
-  animation: blink 0.7s infinite;
+  animation: swc-blink 0.7s infinite;
   margin-left: 2px;
 }
 
-@keyframes blink {
+@keyframes swc-blink {
   0%,
   49% {
     opacity: 1;
@@ -311,7 +316,31 @@
 /* Accessibility improvements */
 .swc-stop-button:focus,
 .swc-send-button:focus,
-.swc-user-input:focus {
-  /* outline: 2px solid var(--swc-theme-color, #007bff); */
+.swc-options-container button:focus,
+.swc-chat-display:focus {
+  outline: 2px solid #1f2937;
   outline-offset: 2px;
+}
+
+.swc-options-container button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.swc-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swc-chat-display { scroll-behavior: auto; }
+  .swc-message, .swc-typing-indicator span, .swc-streaming::after { animation: none; }
+  .swc-options-container button, .swc-stop-button { transition: none; }
 }

@@ -1,89 +1,25 @@
 ---
 name: senangwebs-chatbot
-description: Customizable website chatbot with keyword-based responses, OpenRouter AI integration, and hybrid mode.
-version: 1.3.2
+description: Website chatbot with keyword replies, OpenRouter-compatible AI, and hybrid mode.
+version: 1.4.0
 package: senangwebs-chatbot
 ---
 
-# SenangWebs Chatbot (SWC)
+# SenangWebs Chatbot
 
-## Quick Reference
+Read README.md, package.json, and relevant source modules before changing the library. Preserve the 1.x signatures, attributes, UMD bundle, CSS prefix `swc-`, and 1.x/2.x history compatibility.
 
-- **Purpose**: Embeddable chatbot with keyword matching, AI (OpenRouter), or hybrid conversation modes
-- **Entry**: `dist/swc.js` (UMD bundle), source entry `src/js/swc.js`
-- **Dist assets**: `swc.css`, `swc.min.css`, `swc.js`, `swc.min.js`
-- **Dependencies**: none
-- **Scripts**: `npm run build`, `npm run dev`, `npm run test`
+The entry is `src/js/swc.js`. The conversation engine, transport, context, validation, default knowledge base, and DOM mounting are separate modules. Distribution assets are `swc.css`, `swc.min.css`, `swc.js`, and `swc.min.js` in dist.
 
-## Workflow
-
-Start in `C:\wamp64\www\sw-libraries\senangwebs-chatbot`. Read `README.md`, `package.json`, and touched source files. Match existing patterns, CSS prefix `swc-`.
-
-## HTML Data Attributes
-
-| Attribute | Description |
-|---|---|
-| `data-swc` | Chatbot container flag |
-| `data-swc-theme-color` | Primary theme color (hex) |
-| `data-swc-bot-name` | Display name for the bot |
-| `data-swc-chat-display` | `"modern"` or `"classic"` |
-| `data-swc-api-mode` | `"keyword-only"`, `"ai-only"`, or `"hybrid"` |
-| `data-swc-api-key` | OpenRouter API key (use proxy in production) |
-| `data-swc-api-model` | OpenRouter model name |
-| `data-swc-system-prompt` | System prompt for AI mode |
-| `data-swc-api-base-url` | Custom OpenRouter-compatible API root or proxy endpoint |
-| `data-swc-greeting` | Initial bot greeting message |
-
-## JavaScript API
-
-### Core
-```js
-new SenangWebsChatbot(container, options)
+```javascript
+new SWC.SenangWebsChatbot(knowledgeBase, botMetadata, apiConfig)
+SWC.initializeChatbot(knowledgeBase)
 ```
 
-### Chat History
-```js
-chatbot.exportHistory()   // returns JSON
-chatbot.loadHistory(json)
-chatbot.clearHistory()
-```
+Use `data-swc-manual-init` when supplying a custom or asynchronously loaded knowledge base. Access mounted instances through `element.chatbotInstance`. Use `data-swc-api-endpoint` / `endpointURL` for an exact proxy URL; `data-swc-api-base-url` / `baseURL` are API roots. Keep real provider keys on the server.
 
-### AI Control
-```js
-chatbot.cancelAIResponse()  // cancels streaming response
-```
+Use bundled DOMPurify for keyword/legacy bot HTML; user, AI, fallback, and error content stays text during live display and history restoration. Clear/load/destroy invalidate all pending work. Cancellation preserves partial text once and completes with `cancelled: true`.
 
-### Utilities
-```js
-new OpenRouterAPI(config)     // standalone OpenRouter client
-new ContextManager(config)    // conversation context management
-```
+Exports are `SenangWebsChatbot`, `initializeChatbot`, `defaultKnowledgeBase`, `OpenRouterAPI`, and `ContextManager`. History events are `swc:history-exported` (`historyJSON`), `swc:history-loaded`, and `swc:history-cleared`. Invalid widget configuration emits `swc:error`.
 
-### Custom Events
-`swc:history-exported`, `swc:history-loaded`, `swc:history-cleared`
-
-## Focus Areas
-
-- Three conversation modes: keyword-only (fast, local), AI-only (OpenRouter streaming), hybrid (keyword first, fallback to AI)
-- Streaming response display with typing indicators
-- Proxy pattern for API key security (never expose keys client-side in examples)
-- Chat history import/export as JSON, localStorage persistence
-- Context management for multi-turn AI conversations
-- Theming: colors, bot name, modern/classic display styles
-
-## Implementation Guidance
-
-- NEVER expose real API keys in example code or README; always show proxy pattern
-- Preserve backward compatibility for all attributes and method signatures
-- Test streaming responses handle cancellation and error states gracefully
-- Verify keyword matching priority in hybrid mode
-- Keep npm metadata pointed at `dist/swc.js`; the bundle must expose `SenangWebsChatbot`, `initializeChatbot`, and `defaultKnowledgeBase`
-- `npm run build` must emit exactly the four distributable assets in `dist`: `swc.css`, `swc.min.css`, `swc.js`, `swc.min.js`
-
-## Validation
-
-```bash
-npm run build
-npm run dev      # for manual testing with browser
-npm test         # placeholder
-```
+Validation commands are `npm run build`, `npm run check:package`, `npm audit`, and `npm run test:browser`. **Do not run unit tests without explicit permission**, following AGENTS.md. The unit command is `npm test`; CI only enables it through the manual workflow approval checkbox. See SECURITY.md.

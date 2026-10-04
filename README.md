@@ -1,766 +1,231 @@
 # SenangWebs Chatbot (SWC)
 
-SenangWebs Chatbot is a lightweight JavaScript library that enables easy integration of a customizable chatbot into your website. With minimal setup, you can add an interactive customer support feature powered by AI or keyword-based responses to your web pages, enhancing user engagement and support capabilities.
+An embeddable JavaScript chatbot with keyword conversations, OpenRouter-compatible AI, and hybrid routing. It ships a UMD JavaScript bundle and a separate stylesheet, with modern and classic layouts.
 
 ![SenangWebs Chatbot Preview](https://raw.githubusercontent.com/a-hakim/senangwebs-chatbot/master/swc_preview.png)
 
-## Features
-
-### Core Features
-
-- Easy to integrate with existing projects
-- Customizable chatbot interface
-- Themeable with custom colors
-- Modern and classic chat display styles
-- Typing indicator with customizable delay
-- Smooth scrolling and fade-in animations
-- Efficient performance
-- Responsive and works on all modern browsers
-
-### Conversation Modes
-
-- **Keyword-Only Mode** - Traditional keyword-based responses with partial matching
-- **AI-Only Mode** - Pure AI-powered conversations using OpenRouter API
-- **Hybrid Mode** - Intelligent fallback: keywords first, AI when no match found
-
-### AI Capabilities (OpenRouter Integration)
-
-- **Multiple AI Models** - Support for GPT-3.5, GPT-4, Claude, Llama, and more
-- **Streaming Responses** - Real-time token-by-token text generation
-- **Context Management** - Maintains conversation history for coherent dialogues
-- **Smart Keyword Fallback** - Seamlessly switches between keyword and AI responses
-- **Stop Generation** - User can interrupt AI responses mid-stream
-- **Customizable System Prompts** - Define AI personality and behavior
-- **Proxy Support** - Secure API key handling via backend proxies
-
-### Data Management
-
-- **Chat history management** - Export, import, and restore conversations
-- **Declarative history loading** - Load chat history via data attributes
-- **External knowledge base** - Load conversation flows from JSON files
-- **Custom events** - Listen to history operations and AI events
-
 ## Installation
-
-### Using npm
 
 ```bash
 npm install senangwebs-chatbot
 ```
 
-Import the JavaScript bundle and stylesheet from the package:
+With a browser bundler:
 
 ```javascript
 import * as SWC from "senangwebs-chatbot";
 import "senangwebs-chatbot/dist/swc.css";
-
-const { initializeChatbot, SenangWebsChatbot, defaultKnowledgeBase } = SWC;
+const { SenangWebsChatbot, initializeChatbot, defaultKnowledgeBase, OpenRouterAPI, ContextManager } = SWC;
 ```
 
-The package ships readable and minified browser assets:
-`dist/swc.css`, `dist/swc.min.css`, `dist/swc.js`, and `dist/swc.min.js`.
-
-For CommonJS:
+With CommonJS:
 
 ```javascript
-const { initializeChatbot, SenangWebsChatbot, defaultKnowledgeBase } = require("senangwebs-chatbot");
+const { SenangWebsChatbot, initializeChatbot, defaultKnowledgeBase, OpenRouterAPI, ContextManager } = require("senangwebs-chatbot");
 ```
 
-### Using a CDN
-
-You can include SenangWebs Chatbot directly in your HTML file using unpkg:
+The package entry is UMD, intended for CommonJS or a browser bundler; it is not a native browser ES module. Requiring it without a DOM is supported. For CDN use, pin a released version:
 
 ```html
-<link
-  rel="stylesheet"
-  href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.min.css"
-/>
-<script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/senangwebs-chatbot@1.4.0/dist/swc.min.css">
+<script src="https://unpkg.com/senangwebs-chatbot@1.4.0/dist/swc.min.js"></script>
 ```
 
-## Basic Usage
+These CDN examples target the next 1.4.0 release. Until it is published, use the local `dist` assets. Both readable and minified distributions expose `SWC`, `initializeChatbot`, `OpenRouterAPI`, and `ContextManager` in the browser. The main chatbot class is `SWC.SenangWebsChatbot`.
 
-### 1. Keyword-Only Mode (Traditional)
-
-1. Include the SenangWebs Chatbot CSS and JavaScript files in your HTML:
+## Keyword conversations
 
 ```html
-<link rel="stylesheet" href="path/to/swc.css" />
-<script src="path/to/swc.js"></script>
+<div data-swc data-swc-bot-name="Support" data-swc-theme-color="#0D9488" data-swc-chat-display="modern"></div>
 ```
 
-2. Add the chatbot container to your HTML:
+Widgets initialize automatically when the DOM is ready. Repeated calls to `initializeChatbot()` do not duplicate an existing widget. For a custom knowledge base, add `data-swc-manual-init` before loading the bundle:
 
 ```html
-<div
-  data-swc
-  data-swc-theme-color="#ff6600"
-  data-swc-bot-name="SenangWebs"
-  data-swc-chat-display="modern"
-  data-swc-reply-duration="500"
-></div>
-```
-
-3. Initialize the chatbot:
-
-The chatbot will initialize automatically when the DOM is fully loaded. If you need to initialize it manually or with a custom knowledge base, you can do so in your JavaScript code:
-
-```javascript
-document.addEventListener("DOMContentLoaded", function () {
-  // Use default knowledge base
-  initializeChatbot();
-
-  // Or use a custom knowledge base
-  const customKnowledgeBase = [
-    // Your custom knowledge base here
+<div data-swc data-swc-manual-init></div>
+<script>
+  const knowledgeBase = [
+    { id: "welcome", keyword: ["hello", "hi"], reply: "Welcome!", options: [{ label: "Help", reply_id: "help" }] },
+    { id: "help", keyword: ["help", "support"], reply: "How can we help?" }
   ];
-  initializeChatbot(customKnowledgeBase);
+  initializeChatbot(knowledgeBase);
+</script>
+```
+
+Each node requires a unique string `id`, a `keyword` array of nonempty strings, and a string `reply`. Optional `options` require string `label` and `reply_id` fields; every knowledge-base option must refer to an existing node. An empty knowledge base is supported. Partial keyword matching is case-insensitive. Hybrid mode uses AI when there is no match or the match confidence is below `hybridThreshold`.
+
+Knowledge replies support sanitized HTML. DOMPurify is bundled, using its HTML profile with style elements disabled. User messages, AI output, fallback replies, and errors render as literal text. These same rules apply when restoring history; legacy bot messages without a source use sanitized HTML.
+
+## External knowledge base
+
+Use a JSON file containing `{ "knowledgeBase": [...] }` with the same node structure. Mark the container for manual initialization so auto-init does not install the default knowledge base before the fetch finishes:
+
+```html
+<div data-swc data-swc-manual-init></div>
+<script>
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const response = await fetch("./knowledge-base.json");
+      if (!response.ok) throw new Error("Knowledge base unavailable");
+      const data = await response.json();
+      initializeChatbot(data.knowledgeBase);
+    } catch (error) {
+      initializeChatbot(SWC.defaultKnowledgeBase);
+    }
+  });
+</script>
+```
+
+There is a runnable example in `examples/advanced-features/03-external-knowledge-base.html`. `data-swc-load` loads conversation history, not a knowledge base.
+
+## AI and hybrid conversations
+
+Keep provider keys on your server. Point the widget at an exact proxy endpoint:
+
+```html
+<div data-swc
+     data-swc-api-mode="ai-only"
+     data-swc-api-endpoint="/api/chat"
+     data-swc-api-model="openai/gpt-3.5-turbo"
+     data-swc-api-streaming="true"
+     data-swc-system-prompt="You are a concise support assistant."></div>
+```
+
+Set the mode to `hybrid` to use keyword replies first. Set `data-swc-api-streaming="false"` for ordinary JSON completions. Streaming requests remain stoppable when a reply delay is configured, including before the first token arrives.
+
+`data-swc-api-base-url` / `baseURL` specify an API root: the client appends `/chat/completions`. `data-swc-api-endpoint` / `endpointURL` specify the complete endpoint and take precedence over the root. Relative URLs resolve against the page's base URL. Migrate proxy URLs formerly shown in the base-url attribute to the endpoint attribute.
+
+The proxy receives an OpenAI-compatible POST body with `model`, `messages`, `max_tokens`, `temperature`, and `stream`. Return a chat completion JSON object when `stream` is false, or SSE when it is true. Proxy requests without a configured key send only the `Content-Type` application header. Attribution headers are sent only to `openrouter.ai`; a supplied key adds `Authorization`. Browser cookies follow fetch's default same-origin policy.
+
+The examples in `examples/proxy-servers/` illustrate the transport contract. Server authentication, abuse prevention, CORS, and cost controls must be configured by the host application; those examples are not a production security certification.
+
+Direct OpenRouter access with `apiKey` / `data-swc-api-key` remains available for local experiments. Any key configured in a browser is visible to visitors.
+
+## Configuration
+
+| Attribute | Default / meaning |
+|---|---|
+| `data-swc` | Marks a widget container |
+| `data-swc-manual-init` | Skip automatic/default initialization; pass a knowledge base explicitly |
+| `data-swc-bot-name` | `Bot` |
+| `data-swc-theme-color` | `#007bff`; choose a color with sufficient contrast |
+| `data-swc-chat-display` | `classic`; also accepts `modern` |
+| `data-swc-reply-duration` | `0`; nonnegative delay in milliseconds |
+| `data-swc-load` | History JSON or a relative/absolute history URL |
+| `data-swc-api-mode` | `keyword-only`; `hybrid` when an API URL or key is supplied; also accepts `ai-only` |
+| `data-swc-api-key` | Optional for proxies; required for OpenRouter |
+| `data-swc-api-base-url` | API root; default `https://openrouter.ai/api/v1` |
+| `data-swc-api-endpoint` | Exact proxy/completion URL; overrides the root |
+| `data-swc-api-model` | `openai/gpt-3.5-turbo`; use a model supported by your provider |
+| `data-swc-api-streaming` | `true` |
+| `data-swc-api-max-tokens` | `500`; integer from 1 to 32768 |
+| `data-swc-api-temperature` | `0.7`; number from 0 to 2 |
+| `data-swc-system-prompt` | `You are a helpful assistant.` |
+| `data-swc-hybrid-threshold` | `0.3`; number from 0 to 1 |
+| `data-swc-context-max-messages` | `10`; integer from 0 to 10000 |
+| `data-swc-context-max-tokens` | `2000`; nonnegative integer, estimated conversation tokens |
+| `data-swc-api-timeout` | `30000`; milliseconds for the whole request, including retries and body consumption; `0` disables |
+| `data-swc-api-retry-attempts` | `2`; integer from 0 to 10 |
+| `data-swc-api-retry-delay` | `1000`; nonnegative base backoff in milliseconds |
+| `data-swc-debug` | `false`; enables diagnostic logging |
+
+Invalid numeric settings are rejected instead of silently producing a broken widget. Valid zero settings are preserved. Initialization failures emit `swc:error` and do not prevent other containers from initializing. The active user question is always sent, even when memory is disabled or the question exceeds the memory budget. The system prompt and active question are separate from the estimated conversation-memory budget; token estimates do not guarantee a provider's context limit.
+
+## JavaScript API
+
+```javascript
+const bot = new SWC.SenangWebsChatbot(knowledgeBase, { botName: "Support", themeColor: "#0D9488" }, {
+  mode: "hybrid", endpointURL: "https://example.com/api/chat", streaming: true,
+  maxTokens: 500, temperature: 0.7, systemPrompt: "Be helpful.",
+  contextMaxMessages: 10, contextMaxTokens: 2000, hybridThreshold: 0.3,
+  timeout: 30000, retryAttempts: 2, retryDelay: 1000
+});
+bot.init();
+const response = await bot.handleInput("hello", {
+  onStart: () => {},
+  onChunk: ({ content, fullContent }) => {},
+  onComplete: ({ content, model, cancelled }) => {},
+  onError: error => {}
 });
 ```
 
-### 2. AI-Powered Mode (OpenRouter Integration)
+The constructor creates the conversation engine. `initializeChatbot(knowledgeBase)` mounts UI into marked containers; access each mounted engine through `element.chatbotInstance`.
 
-Enable AI-powered conversations using OpenRouter API:
+| Method | Behavior |
+|---|---|
+| `init()` | Select welcome/first node and return its reply/options |
+| `handleInput(input, callbacks)` | Return a Promise for a reply; overlapping AI input returns `busy: true` without recording it |
+| `handleOptionSelection(replyId)` | Return a keyword reply/options |
+| `cancelAIResponse()` | Stop generation; return whether an AI request was active |
+| `getAPIStatus()` | Configuration/status without exposing the API key |
+| `exportHistory()` | Export a JSON string |
+| `getHistory()` | Return a detached history object |
+| `getCurrentState()` | Current node and message-count metadata |
+| `loadHistory(data)` | Atomically import history; return `{ success, messageCount, messages }` or `{ success: false, error, messages: [] }` |
+| `clearHistory()` | Cancel pending work, clear AI context, restore welcome |
+| `destroy()` | Idempotent teardown; cancel work and remove owned UI while preserving host content |
 
-```html
-<div
-  data-swc
-  data-swc-theme-color="#0D9488"
-  data-swc-bot-name="AI Assistant"
-  data-swc-chat-display="modern"
-  data-swc-api-mode="ai-only"
-  data-swc-api-key="sk-or-v1-..."
-  data-swc-api-model="openai/gpt-3.5-turbo"
-  data-swc-api-streaming="true"
-  data-swc-system-prompt="You are a helpful customer support assistant. Be concise and friendly."
-></div>
-```
+After `destroy()`, initialize the container again. For containers with `data-swc-manual-init`, pass the knowledge base again. New input or history mutations on a destroyed engine are rejected.
 
-### 3. Hybrid Mode (Best of Both Worlds)
+Cancellation retains any partial AI text as one bot message, returns `cancelled: true`, and invokes `onComplete` with that flag rather than `onError`. Clear/load/destroy invalidate pending callbacks and discard their results. Transient network failures, HTTP 429, and HTTP 5xx may retry before content is delivered; cancellation, timeout, malformed/provider stream events, consumer callback exceptions, and partial responses do not retry. Completion and error callbacks are mutually exclusive.
 
-Combine keyword matching with AI fallback for optimal responses:
+`OpenRouterAPI` and `ContextManager` are also exported. The client supports `sendMessage(messages, onChunk, onComplete, onError)`, `cancel()`, and `getModelInfo()`. Context supports `addMessage(role, content)`, `getContext(includeSystem)`, `clear()`, `getStats()`, `getLastMessages(count)`, `setSystemPrompt(prompt)`, `summarize()`, `export()`, `import(data)`, and `injectKnowledge(text)`. Standalone clients accept the transport fields above without the `mode` or context fields. Relative endpoints require a browser document; server-side clients need absolute URLs.
 
-```html
-<div
-  data-swc
-  data-swc-theme-color="#6366F1"
-  data-swc-bot-name="Smart Bot"
-  data-swc-chat-display="modern"
-  data-swc-api-mode="hybrid"
-  data-swc-api-key="sk-or-v1-..."
-  data-swc-api-model="openai/gpt-3.5-turbo"
-  data-swc-hybrid-threshold="0.3"
-></div>
-```
-
-**How Hybrid Mode Works:**
-
-1. User sends a message
-2. Chatbot checks keyword knowledge base first
-3. If good match found (score > threshold), uses keyword response
-4. If no good match, falls back to AI
-5. Seamless experience for users
-
-## Advanced Usage: External JSON Knowledge Base
-
-You can use an external JSON file to define your chatbot's knowledge base. This allows for easier management and updating of the chatbot's responses without modifying the main code.
-
-1. Create a JSON file for your knowledge base (e.g., `knowledge-base.json`):
+## History and events
 
 ```json
 {
-  "knowledgeBase": [
-    {
-      "id": "welcome",
-      "keyword": ["hello", "hi", "hey", "start"],
-      "reply": "Welcome to SenangWebs Chatbot! How can I assist you today?",
-      "options": [
-        { "label": "Product Information", "reply_id": "product_info" },
-        { "label": "Pricing", "reply_id": "pricing" },
-        { "label": "Support", "reply_id": "support" }
-      ]
-    }
-    // Add more nodes as needed
-  ]
-}
-```
-
-2. Use the following HTML and JavaScript to load and use the external knowledge base:
-
-```html
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SenangWebs Chatbot Example</title>
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.css"
-    />
-    <script src="https://unpkg.com/senangwebs-chatbot@latest/dist/swc.js"></script>
-  </head>
-  <body>
-    <div
-      id="chatbot-container"
-      data-swc
-      data-swc-theme-color="#4CAF50"
-      data-swc-bot-name="SenangBot"
-      data-swc-chat-display="modern"
-      data-swc-reply-duration="800"
-    ></div>
-
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        fetch("knowledge-base.json")
-          .then((response) => response.json())
-          .then((data) => {
-            initializeChatbot(data.knowledgeBase);
-          })
-          .catch((error) => {
-            console.error("Error loading knowledge base:", error);
-            // Initialize with default knowledge base if there's an error
-            initializeChatbot();
-          });
-      });
-    </script>
-  </body>
-</html>
-```
-
-This example demonstrates how to load an external JSON file and use it to initialize the chatbot. If the JSON file fails to load, it falls back to the default knowledge base.
-
-## Configuration Options
-
-### Chatbot Container Attributes
-
-#### Basic Attributes
-
-- `data-swc`: Indicates that this element should be initialized as a chatbot
-- `data-swc-theme-color`: Sets the primary color for the chatbot interface (e.g., "#ff6600")
-- `data-swc-bot-name`: Sets the name of the chatbot (e.g., "SenangWebs")
-- `data-swc-chat-display`: Sets the chat display style ("modern" or "classic")
-- `data-swc-reply-duration`: Sets the delay (in milliseconds) before the bot replies
-- `data-swc-load`: Loads chat history from a JSON file path or inline JSON string
-
-#### AI/API Attributes
-
-- `data-swc-api-mode`: Conversation mode - "keyword-only", "ai-only", or "hybrid" (default: "keyword-only")
-- `data-swc-api-key`: OpenRouter API key (required for AI modes)
-- `data-swc-api-model`: AI model to use (e.g., "openai/gpt-3.5-turbo")
-- `data-swc-api-streaming`: Enable streaming responses (true/false, default: true)
-- `data-swc-system-prompt`: Custom system prompt for AI personality
-- `data-swc-api-base-url`: Custom OpenRouter-compatible API root or proxy endpoint (default: OpenRouter)
-- `data-swc-api-max-tokens`: Maximum tokens in AI response (default: 500)
-- `data-swc-api-temperature`: AI creativity level 0-2 (default: 0.7)
-- `data-swc-hybrid-threshold`: Keyword match threshold for hybrid mode (default: 0.3)
-- `data-swc-context-max-messages`: Number of messages to keep in context (default: 10)
-
-### Supported AI Models
-
-The chatbot supports all OpenRouter-compatible models, including:
-
-**OpenAI Models:**
-
-- `openai/gpt-3.5-turbo` - Fast and cost-effective
-- `openai/gpt-4-turbo` - Most capable, higher cost
-- `openai/gpt-4` - Balanced performance
-
-**Anthropic Claude:**
-
-- `anthropic/claude-3-haiku` - Fast and efficient
-- `anthropic/claude-3-sonnet` - Balanced
-- `anthropic/claude-3-opus` - Most capable
-
-**Open Source Models:**
-
-- `meta-llama/llama-3-8b-instruct` - Free, good performance
-- `meta-llama/llama-3-70b-instruct` - More capable
-- `nvidia/nemotron-nano-12b-v2-vl:free` - Free with vision
-
-**And many more!** Check [OpenRouter Models](https://openrouter.ai/models) for the full list.
-
-### Knowledge Base Structure
-
-The knowledge base is an array of objects with the following structure:
-
-```javascript
-{
-  id: 'unique_id',
-  keyword: ['keyword1', 'keyword2'],
-  reply: 'Chatbot response',
-  options: [
-    { label: 'Option 1', reply_id: 'next_response_id' },
-    { label: 'Option 2', reply_id: 'another_response_id' }
-  ]
-}
-```
-
-- `id`: A unique identifier for the conversation node
-- `keyword`: An array of keywords that trigger this response. The chatbot will match full or partial keywords in the user's input.
-- `reply`: The chatbot's response text
-- `options`: (Optional) An array of follow-up options for the user to choose from
-
-Note: The chatbot uses a flexible keyword matching system. It will match full keywords, partial keywords, and even consider multiple keyword matches in a single user input. This allows for more natural conversation flow and better handling of variations in user input.
-
-## Chat History Management
-
-SenangWebs Chatbot includes powerful chat history features that allow you to save, load, and restore conversations.
-
-### History API
-
-Access the chatbot instance to manage history:
-
-```javascript
-const chatbotElement = document.querySelector("[data-swc]");
-const chatbot = chatbotElement.chatbotInstance;
-
-// Export history as JSON string
-const historyJSON = chatbot.exportHistory();
-
-// Load history from JSON string or object
-chatbot.loadHistory(historyData);
-
-// Clear all history
-chatbot.clearHistory();
-
-// Get current history
-const history = chatbot.getHistory();
-```
-
-### Declarative History Loading
-
-Load chat history directly via HTML data attributes:
-
-**Load from external JSON file:**
-
-```html
-<div
-  data-swc
-  data-swc-load="./path/to/history.json"
-  data-swc-theme-color="#ff6600"
-></div>
-```
-
-**Load from inline JSON:**
-
-```html
-<div
-  data-swc
-  data-swc-load='{"version":"1.0","messages":[...]}'
-  data-swc-theme-color="#ff6600"
-></div>
-```
-
-### History Data Structure
-
-The chat history is stored in the following JSON format:
-
-```json
-{
-  "version": "1.0",
-  "timestamp": "2024-11-02T10:30:00.000Z",
-  "botName": "SenangWebs",
-  "themeColor": "#ff6600",
+  "version": "2.0",
+  "botName": "Support",
+  "themeColor": "#0D9488",
   "messages": [
-    {
-      "id": "msg-1730545800000-abc",
-      "timestamp": "2024-11-02T10:30:00.000Z",
-      "type": "bot",
-      "content": "<p>Welcome message</p>",
-      "nodeId": "welcome",
-      "options": [{ "label": "Option 1", "reply_id": "node_1" }]
-    },
-    {
-      "id": "msg-1730545810000-def",
-      "timestamp": "2024-11-02T10:30:10.000Z",
-      "type": "user",
-      "content": "User response"
-    }
+    { "type": "user", "content": "Hello" },
+    { "type": "bot", "content": "Welcome", "source": "keyword", "nodeId": "welcome" }
   ],
   "currentNodeId": "welcome"
 }
 ```
 
-## Secure API Key Management
+Both 1.x and 2.x history formats are accepted. Types must be `user` or `bot`; content must be a string. Optional `source` is `keyword`, `api`, `fallback`, or `error`. Invalid imports leave the current conversation unchanged. Failed declarative history loading restores welcome. External history loading disables input until it settles; clear/load/destroy can invalidate that load.
 
-**⚠️ IMPORTANT: Never expose your OpenRouter API key in client-side code in production!**
+Mounted widgets dispatch these events on their container:
 
-For production use, implement a backend proxy server to handle API requests securely:
-
-### Option 1: Node.js Proxy (Express)
-
-```javascript
-// server.js
-const express = require("express");
-const app = express();
-
-app.use(express.json());
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*");
-  next();
-});
-
-app.post("/api/chat", async (req, res) => {
-  const response = await fetch(
-    "https://openrouter.ai/api/v1/chat/completions",
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(req.body),
-    }
-  );
-
-  const data = await response.json();
-  res.json(data);
-});
-
-app.listen(3000);
-```
-
-### Option 2: PHP Proxy
-
-```php
-<?php
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json');
-
-$apiKey = getenv('OPENROUTER_API_KEY');
-$input = json_decode(file_get_contents('php://input'), true);
-
-$ch = curl_init('https://openrouter.ai/api/v1/chat/completions');
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    'Authorization: Bearer ' . $apiKey,
-    'Content-Type: application/json'
-]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($input));
-
-echo curl_exec($ch);
-curl_close($ch);
-```
-
-### Option 3: Cloudflare Workers
+| Event | Detail fields (plus `timestamp`) |
+|---|---|
+| `swc:history-exported` | `messageCount`, `historyJSON` |
+| `swc:history-loaded` | `messageCount` |
+| `swc:history-cleared` | No additional fields |
+| `swc:error` | `code: "configuration"`, `message` |
 
 ```javascript
-export default {
-  async fetch(request) {
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${env.OPENROUTER_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: await request.text(),
-      }
-    );
-
-    return new Response(await response.text(), {
-      headers: { "Access-Control-Allow-Origin": "*" },
-    });
-  },
-};
-```
-
-### Using Proxy in Chatbot
-
-```html
-<div
-  data-swc
-  data-swc-api-mode="ai-only"
-  data-swc-api-base-url="https://your-domain.com/api/chat"
-></div>
-```
-
-See `examples/proxy-servers/` for complete implementation examples.
-
-## Custom Events
-
-The chatbot dispatches custom events for various operations:
-
-### History Events
-
-```javascript
-// Listen for history export
-chatbotElement.addEventListener("swc:history-exported", (e) => {
-  console.log("History exported:", e.detail.history);
-});
-
-// Listen for history load
-chatbotElement.addEventListener("swc:history-loaded", (e) => {
-  console.log("History loaded:", e.detail.messageCount);
-});
-
-// Listen for history clear
-chatbotElement.addEventListener("swc:history-cleared", () => {
-  console.log("History cleared");
+const element = document.querySelector("[data-swc]");
+element.addEventListener("swc:history-exported", event => {
+  const history = JSON.parse(event.detail.historyJSON);
 });
 ```
 
-AI responses can be observed through the `handleInput` callback hooks: `onStart`, `onChunk`, `onComplete`, and `onError`.
+History may contain personal information. Storage, retention, and export controls belong to the host application; the library does not persist history automatically.
 
-## API Reference
+## Styling and accessibility
 
-### SenangWebsChatbot Class
+Override `.swc-bot-message`, `.swc-user-message`, `.swc-input-container`, and `.swc-options-container` in your application stylesheet. The transcript is a labeled, focusable log; a separate polite status region announces completed replies and loading state without announcing every streamed token. Inputs have accessible labels, buttons do not submit enclosing forms, and focus remains visible. Reduced-motion settings disable animations and smooth scrolling. Custom theme colors require host-side contrast verification.
 
-```javascript
-const chatbot = new SenangWebsChatbot(knowledgeBase, botMetadata, apiConfig);
-```
-
-**Parameters:**
-
-- `knowledgeBase` (Array): Array of conversation nodes for keyword matching
-- `botMetadata` (Object): Bot configuration (name, theme color, etc.)
-- `apiConfig` (Object): API configuration for AI features
-
-**Methods:**
-
-- `handleInput(input)` - Process user text input
-- `handleOptionSelection(replyId)` - Process button click
-- `exportHistory()` - Export chat history as JSON string
-- `loadHistory(data)` - Load chat history from JSON
-- `clearHistory()` - Clear all chat history
-- `getHistory()` - Get current history object
-- `getAPIStatus()` - Get API configuration and response status
-- `cancelAIResponse()` - Stop ongoing AI generation
-
-### OpenRouterAPI Class
-
-```javascript
-const api = new OpenRouterAPI({
-  apiKey: "sk-or-v1-...",
-  model: "openai/gpt-3.5-turbo",
-  maxTokens: 500,
-  temperature: 0.7,
-  streaming: true,
-});
-```
-
-**Methods:**
-
-- `sendMessage(messages, onStream, onComplete, onError)` - Send chat completion request
-- `cancel()` - Abort ongoing API request
-- `getModelInfo()` - Get model, token, and temperature settings
-
-### ContextManager Class
-
-```javascript
-const context = new ContextManager({ maxMessages: 10 });
-```
-
-**Methods:**
-
-- `addMessage(role, content)` - Add message to context
-- `getContext()` - Get formatted context for API
-- `clear()` - Clear all context
-- `getStats()` - Get message, token, and limit statistics
-
-## Examples
-
-The `examples/` directory contains several demonstration pages:
-
-### Basic Examples
-
-#### 1. Simple Chatbot (`examples/basic/01-simple-chatbot.html`)
-
-Traditional keyword-based chatbot with conversation flows and options.
-
-#### 2. Basic Showcase (`examples/index.html`)
-
-Demonstrates modern and classic display styles, theme customization, and basic functionality.
-
-### Advanced Features
-
-#### 3. Chat History Demo (`examples/advanced-features/01-chat-history.html`)
-
-Interactive demonstration of chat history features:
-
-- Export conversations as JSON files
-- Import and restore from JSON files
-- Clear conversation history
-- Save/load to/from LocalStorage
-- Real-time event logging
-
-#### 4. External Knowledge Base (`examples/advanced-features/02-external-knowledge-base.html`)
-
-Shows how to load conversation flows from external JSON files for easier content management.
-
-### API Integration Examples
-
-#### 5. AI-Only Mode (`examples/api-integration/01-ai-only-mode.html`)
-
-Pure AI-powered chatbot using OpenRouter API with streaming responses.
-
-#### 6. Hybrid Mode (`examples/api-integration/02-hybrid-mode.html`)
-
-Intelligent fallback system combining keyword matching with AI responses.
-
-#### 7. Interactive Testing (`examples/api-integration/03-interactive-testing.html`)
-
-Full-featured testing environment with:
-
-- API key configuration
-- Model selection (GPT, Claude, Llama, etc.)
-- Mode switching (keyword/AI/hybrid)
-- Real-time testing interface
-
-#### 8. Secure Proxy Setup (`examples/api-integration/04-secure-proxy-setup.html`)
-
-Production-ready proxy implementation examples:
-
-- Node.js Express proxy
-- PHP proxy
-- Cloudflare Workers proxy
-- API key security best practices
-
-### Running Examples
-
-To run the examples locally:
+## Development and release
 
 ```bash
-# Using Python
-python -m http.server 8000
-
-# Using Node.js (http-server)
-npx http-server
-
-# Using PHP
-php -S localhost:8000
-```
-
-Then navigate to `http://localhost:8000/examples/`
-
-## Customization
-
-You can customize the chatbot's appearance by modifying the CSS file or overriding styles in your own stylesheet. The chatbot's primary color and other visual aspects can be set using the data attributes on the container element.
-
-To create a custom knowledge base, follow the structure outlined in the Configuration Options section.
-
-### Custom Styling Example
-
-```css
-/* Override chatbot colors */
-[data-swc] {
-  --swc-theme-color: #6366f1;
-  --swc-border-radius: 12px;
-}
-
-/* Customize message bubbles */
-.swc-message-bot {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Customize input area */
-.swc-input-area {
-  border-top: 2px solid #e5e7eb;
-  padding: 20px;
-}
-```
-
-## Performance Considerations
-
-### Keyword Mode
-
-- Instant responses (no API calls)
-- No external dependencies
-- Works offline
-- Best for FAQ and guided conversations
-
-### AI Mode
-
-- Network latency (1-3 seconds typical)
-- API costs per request
-- Requires internet connection
-- Best for open-ended conversations
-
-### Hybrid Mode
-
-- Best of both worlds
-- Fast keyword responses when possible
-- AI fallback for complex queries
-- Optimal user experience with cost efficiency
-
-## Troubleshooting
-
-### Common Issues
-
-**AI responses not working:**
-
-- Check API key is valid
-- Verify `data-swc-api-mode` is set to "ai-only" or "hybrid"
-- Check browser console for errors
-- Ensure CORS is configured if using custom proxy
-
-**Streaming not working:**
-
-- Verify `data-swc-api-streaming="true"`
-- Check browser supports ReadableStream API
-- Some proxies may buffer responses
-
-**Keyword matching too strict:**
-
-- Lower `data-swc-hybrid-threshold` (default: 0.3)
-- Add more keyword variations to knowledge base
-- Use partial keywords for better matching
-
-**High API costs:**
-
-- Use hybrid mode instead of ai-only
-- Reduce `data-swc-api-max-tokens`
-- Use cheaper models (gpt-3.5-turbo)
-- Implement rate limiting in proxy
-
-## Browser Support
-
-SenangWebs Chatbot works on all modern browsers, including:
-
-- Chrome 90+
-- Firefox 88+
-- Safari 14+
-- Edge 90+
-- Opera 76+
-
-**Note:** Streaming responses require browsers with ReadableStream support (all modern browsers).
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-### Development Setup
-
-```bash
-# Clone repository
-git clone https://github.com/a-hakim/senangwebs-chatbot.git
-
-# Install dependencies
-npm install
-
-# Build for production
+npm ci
 npm run build
-
-# Development mode with watch
-npm run dev
+npm run check:package
+npx playwright install chromium firefox webkit
+npm run test:browser
 ```
+
+The build emits exactly `dist/swc.css`, `dist/swc.min.css`, `dist/swc.js`, and `dist/swc.min.js`. Run the unit suite with `npm test` **only after explicit permission**, following AGENTS.md. CI runs build, packaging, advisory, and browser checks; unit checks require the manual workflow's approval checkbox. See [SECURITY.md](SECURITY.md) for reporting vulnerabilities.
+
+Serve examples with `node scripts/serve-examples.cjs`, then open `http://127.0.0.1:8777/examples/index.html`. `npm run dev` rebuilds assets in watch mode.
+
+The documented browser baseline remains Chrome 90+, Firefox 88+, Safari 14+, Edge 90+, and Opera 76+. Automated browser checks use current Chromium, Firefox, and WebKit; these checks do not certify every historical minimum version.
 
 ## License
 
-MIT License
-
-## Security
-
-**⚠️ Security Best Practices:**
-
-1. **Never commit API keys** to version control
-2. **Always use environment variables** for sensitive data
-3. **Implement backend proxies** for production deployments
-4. **Rate limit API requests** to prevent abuse
-5. **Validate and sanitize** user inputs
-6. **Use HTTPS** for all communications
-
-For security issues, please email security concerns through GitHub's private vulnerability reporting feature.
+MIT. Bundled DOMPurify licensing is reproduced in [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md).

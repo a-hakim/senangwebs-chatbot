@@ -102,8 +102,9 @@
 
             // Remove existing chatbot container and recreate it
             const chatContainer = document.getElementById('chatContainer');
-            const oldChatbot = chatContainer.querySelector('[data-swc-test]');
+            const oldChatbot = chatContainer.querySelector('[data-swc]');
             if (oldChatbot) {
+                oldChatbot.chatbotInstance?.destroy();
                 oldChatbot.remove();
             }
 
@@ -137,7 +138,7 @@
         // Page load handler
         window.addEventListener('DOMContentLoaded', () => {
             console.log('%c🧪 OpenRouter Test Page Loaded', 'color: #0D9488; font-size: 16px; font-weight: bold;');
-            console.log('Version: 1.3.0');
+            console.log('Version: 1.4.0');
             console.log('Features: OpenRouter API Integration with Streaming');
         });
     </script>

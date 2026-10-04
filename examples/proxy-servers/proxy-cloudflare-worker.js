@@ -8,7 +8,7 @@
  * 1. Create a new Cloudflare Worker
  * 2. Add environment variable: OPENROUTER_API_KEY
  * 3. Deploy this code
- * 4. Configure chatbot: data-swc-api-base-url="https://your-worker.workers.dev/chat"
+ * 4. Configure chatbot: data-swc-api-endpoint="https://your-worker.workers.dev/chat"
  * 
  * Deploy with Wrangler:
  * wrangler secret put OPENROUTER_API_KEY

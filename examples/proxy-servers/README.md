@@ -13,7 +13,7 @@ Benefits:
 - ✅ Add authentication
 - ✅ Monitor usage
 - ✅ Control costs
-- ✅ Production-ready
+- ✅ Integration examples; production controls require application configuration
 
 ## Available Implementations
 
@@ -51,7 +51,7 @@ npm run dev
 <div
   data-swc
   data-swc-api-mode="ai-only"
-  data-swc-api-base-url="http://localhost:3000/api/chat"
+  data-swc-api-endpoint="http://localhost:3000/api/chat"
   data-swc-api-model="openai/gpt-3.5-turbo"
 ></div>
 ```
@@ -80,7 +80,7 @@ php -m | grep curl
 <div
   data-swc
   data-swc-api-mode="ai-only"
-  data-swc-api-base-url="https://yourdomain.com/api/chat.php"
+  data-swc-api-endpoint="https://yourdomain.com/api/chat.php"
   data-swc-api-model="openai/gpt-3.5-turbo"
 ></div>
 ```
@@ -124,7 +124,7 @@ wrangler deploy
 <div
   data-swc
   data-swc-api-mode="ai-only"
-  data-swc-api-base-url="https://your-worker.workers.dev/chat"
+  data-swc-api-endpoint="https://your-worker.workers.dev/chat"
   data-swc-api-model="openai/gpt-3.5-turbo"
 ></div>
 ```

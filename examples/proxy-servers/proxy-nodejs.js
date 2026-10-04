@@ -7,7 +7,7 @@
  * Usage:
  * 1. Set OPENROUTER_API_KEY environment variable
  * 2. Run: node proxy-nodejs.js
- * 3. Configure chatbot to use: data-swc-api-base-url="http://localhost:3000/api/chat"
+ * 3. Configure chatbot to use: data-swc-api-endpoint="http://localhost:3000/api/chat"
  */
 
 const express = require('express');

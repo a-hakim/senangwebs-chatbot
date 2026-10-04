@@ -1,39 +1,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-
-class MinifyCssPlugin {
-  apply(compiler) {
-    compiler.hooks.thisCompilation.tap("MinifyCssPlugin", (compilation) => {
-      const { Compilation, sources } = compiler.webpack;
-
-      compilation.hooks.processAssets.tap(
-        {
-          name: "MinifyCssPlugin",
-          stage: Compilation.PROCESS_ASSETS_STAGE_OPTIMIZE_SIZE,
-        },
-        () => {
-          Object.keys(compilation.assets)
-            .filter((filename) => filename.endsWith(".css"))
-            .forEach((filename) => {
-              const source = compilation.assets[filename].source().toString();
-              const minified = source
-                .replace(/\/\*[\s\S]*?\*\//g, "")
-                .replace(/\s+/g, " ")
-                .replace(/\s*([{}:;,>])\s*/g, "$1")
-                .replace(/;}/g, "}")
-                .trim();
-
-              compilation.updateAsset(
-                filename,
-                new sources.RawSource(minified)
-              );
-            });
-        }
-      );
-    });
-  }
-}
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 
 function createConfig({ minified }) {
   const suffix = minified ? ".min" : "";
@@ -48,7 +16,7 @@ function createConfig({ minified }) {
     output: {
       filename: `swc${suffix}.js`,
       path: path.resolve(__dirname, "dist"),
-      clean: !minified,
+      clean: false, // Both compilers share dist; neither may delete the other compiler's assets.
       library: {
         name: "SWC",
         type: "umd",
@@ -77,6 +45,7 @@ function createConfig({ minified }) {
             new TerserPlugin({
               extractComments: false,
             }),
+            new CssMinimizerPlugin(),
           ]
         : [],
     },
@@ -84,7 +53,6 @@ function createConfig({ minified }) {
       new MiniCssExtractPlugin({
         filename: `swc${suffix}.css`,
       }),
-      ...(minified ? [new MinifyCssPlugin()] : []),
     ],
   };
 }

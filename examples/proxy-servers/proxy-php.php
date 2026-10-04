@@ -7,7 +7,7 @@
  * Setup:
  * 1. Set OPENROUTER_API_KEY in your .env file or server config
  * 2. Upload this file to your server (e.g., /api/chat.php)
- * 3. Configure chatbot: data-swc-api-base-url="https://yourdomain.com/api/chat.php"
+ * 3. Configure chatbot: data-swc-api-endpoint="https://yourdomain.com/api/chat.php"
  * 
  * Requirements: PHP 7.4+ with cURL enabled
  */

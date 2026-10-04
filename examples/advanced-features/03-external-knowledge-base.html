@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>External knowledge base — SenangWebs Chatbot</title>
+  <link rel="stylesheet" href="../../dist/swc.css">
+  <script defer src="../../dist/swc.js"></script>
+</head>
+<body>
+  <main style="max-width: 42rem; margin: 2rem auto; padding: 1rem">
+    <h1>External knowledge base</h1>
+    <p>The widget waits for a JSON knowledge base before mounting. Try “delivery” or select an option.</p>
+    <p id="load-status" role="status">Loading knowledge base…</p>
+    <div data-swc data-swc-manual-init data-swc-bot-name="Shop support" data-swc-chat-display="modern"></div>
+  </main>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const response = await fetch('./sample-knowledge-base.json');
+        if (!response.ok) throw new Error('Knowledge base unavailable');
+        const data = await response.json();
+        initializeChatbot(data.knowledgeBase);
+        document.querySelector('#load-status').textContent = 'Knowledge base loaded.';
+      } catch (error) {
+        initializeChatbot(SWC.defaultKnowledgeBase);
+        document.querySelector('#load-status').textContent = 'Using the default knowledge base.';
+      }
+    });
+  </script>
+</body>
+</html>

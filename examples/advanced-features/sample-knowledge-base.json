@@ -1,0 +1,6 @@
+{
+  "knowledgeBase": [
+    { "id": "welcome", "keyword": ["hello", "hi"], "reply": "Welcome to <b>Shop support</b>. What would you like to know?", "options": [{ "label": "Delivery", "reply_id": "delivery" }] },
+    { "id": "delivery", "keyword": ["delivery", "shipping"], "reply": "Delivery usually takes three business days.", "options": [{ "label": "Start again", "reply_id": "welcome" }] }
+  ]
+}
